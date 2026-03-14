@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jimmy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --red: #e94560;
+  --dark: #0b0b14;
+  --card: #13132a;
+  --card2: #1a1a30;
+  --text: #f0f0f8;
+  --muted: #7a7a9a;
+  --border: #252540;
+  --green: #2ecc71;
+}
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 120px;
+}
+
+/* HEADER */
+.header {
+  background: var(--dark);
+  padding: 20px 18px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--red);
+}
+.logo span { color: var(--text); }
+.target-pill {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.target-pill strong { color: var(--red); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 14px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.tab .big { font-family: 'Bebas Neue', sans-serif; font-size: 20px; display: block; line-height: 1.1; }
+.tab.active { background: var(--red); border-color: var(--red); color: white; }
+
+/* CONTENT */
+.content { padding: 18px 16px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 20px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: var(--red);
+  opacity: 0.07;
+  border-radius: 50%;
+}
+.hero-day { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; color: var(--red); }
+.hero-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.hero-sub { font-size: 12px; color: var(--muted); }
+.hero-pills { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.pill {
+  background: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.pill strong { color: var(--text); }
+
+/* SECTION */
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 12px;
+  margin-top: 24px;
+  padding-left: 2px;
+}
+
+/* EXERCISE CARD */
+.ex-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.ex-card.done { border-color: var(--green); opacity: 0.7; }
+.ex-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  gap: 12px;
+}
+.ex-left { flex: 1; }
+.ex-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.ex-meta { display: flex; gap: 12px; }
+.ex-meta span { font-size: 12px; color: var(--muted); }
+.ex-meta span strong { color: var(--text); }
+.ex-right { display: flex; align-items: center; gap: 10px; }
+.check-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.ex-card.done .check-btn {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.chevron {
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.ex-card.open .chevron { transform: rotate(180deg); }
+
+/* EXPAND */
+.ex-body {
+  display: none;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+.ex-card.open .ex-body { display: block; }
+.ex-gif {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: var(--card2);
+  margin: 12px 0;
+  display: block;
+}
+.ex-gif-placeholder {
+  width: 100%;
+  height: 140px;
+  background: var(--card2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 13px;
+  flex-direction: column;
+  gap: 6px;
+}
+.ex-gif-placeholder .ico { font-size: 28px; }
+.cue-box {
+  background: var(--card2);
+  border-left: 3px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.cue-box strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* SET TRACKER */
+.set-tracker { margin-top: 12px; }
+.set-tracker-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.set-dots { display: flex; gap: 8px; }
+.set-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.set-dot.done { background: var(--red); border-color: var(--red); color: white; }
+
+/* PROGRESS BAR */
+.progress-bar-wrap { margin-bottom: 6px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.progress-label strong { color: var(--text); }
+.progress-track { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 4px; transition: width 0.3s ease; }
+
+/* PRINCIPLES */
+.principle {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+.principle-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.principle-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.principle-text strong { color: var(--text); display: block; margin-bottom: 2px; }
+
+/* FINISH CARD */
+.finish-card {
+  background: linear-gradient(135deg, #1a0a1e 0%, #0d1a2e 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 24px;
+}
+.finish-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--text); margin-bottom: 12px; }
+.finish-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
+.finish-item span:first-child { font-size: 18px; }
+
+/* COMPLETE BANNER */
+.complete-banner {
+  background: linear-gradient(135deg, #0a2a1a 0%, #0a1a2a 100%);
+  border: 2px solid var(--green);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+}
+.complete-banner.show { display: block; animation: fadeIn 0.4s ease; }
+.complete-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--green); letter-spacing: 2px; }
+.complete-banner p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+/* RESET BTN */
+.reset-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* SYNC STATUS */
+.sync-badge {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  z-index: 200;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sync-badge.saving { border-color: var(--red); color: var(--red); }
+.sync-badge.saved { border-color: var(--green); color: var(--green); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* HISTORY TAB */
+.history-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.history-day-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--red);
+  line-height: 1;
+  width: 28px;
+  flex-shrink: 0;
+}
+.history-info { flex: 1; }
+.history-date { font-size: 13px; font-weight: 600; color: var(--text); }
+.history-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.history-bar { height: 3px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.history-bar-fill { height: 100%; background: var(--green); border-radius: 3px; }
+.history-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+.history-empty .ico { font-size: 36px; display: block; margin-bottom: 10px; }
+
+/* STREAK CARD */
+.streak-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+}
+.streak-stat { flex: 1; text-align: center; }
+.streak-num { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--red); line-height: 1; }
+.streak-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<!-- CONFIG: set these to match your Railway deployment -->
+<script>
+  const API_URL = '';        // leave empty — same origin. If separate: 'https://your-app.railway.app'
+  const API_KEY = 'CHANGE_ME'; // must match the API_KEY env var in Railway
+</script>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">6-PACK <span>BY SUMMER</span></div>
+    <div class="target-pill">Target: <strong>12–15% BF</strong></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchDay('a')"><span class="big">A</span>Squat</button>
+    <button class="tab" onclick="switchDay('b')"><span class="big">B</span>Deadlift</button>
+    <button class="tab" onclick="switchDay('c')"><span class="big">C</span>Front Sq</button>
+    <button class="tab" onclick="switchDay('d')"><span class="big">D</span>HIIT</button>
+    <button class="tab" onclick="switchDay('h')"><span class="big">📅</span>History</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- DAY A -->
+<div class="panel active" id="panel-a">
+  <div class="hero">
+    <div class="hero-day">A</div>
+    <div class="hero-title">Squat · Bench · Row</div>
+    <div class="hero-sub">~60–70 min including warm-up, abs, and sauna</div>
+    <div class="hero-pills">
+      <div class="pill">🏃 10 min warm-up</div>
+      <div class="pill">🔥 Compound lifts</div>
+      <div class="pill">💪 Accessory</div>
+      <div class="pill">🎯 Abs 10 min</div>
+    </div>
+  </div>
+  <div id="progress-a" class="progress-bar-wrap">
+    <div class="progress-label"><span>Progress</span><strong id="progress-a-text">0 / 9</strong></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-a-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-label">🔥 Compound Lifts</div>
+  <div id="ex-a-0" class="ex-card" onclick="toggleCard('a',0)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Barbell Back Squat</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',0)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-0"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Chest up, knees track toes. Drive through heels. Break parallel. Brace core before descent.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-0"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-1" class="ex-card" onclick="toggleCard('a',1)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Barbell Bench Press</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',1)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-1"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Retract scapula. Touch lower chest. Full lock-out at top. Feet flat on floor.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-1"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-2" class="ex-card" onclick="toggleCard('a',2)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Bent-Over Barbell Row</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',2)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-2"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Hinge at hips, back flat. Pull bar to navel. Squeeze shoulder blades together at top.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-2"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">💪 Accessory Work</div>
+  <div id="ex-a-3" class="ex-card" onclick="toggleCard('a',3)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Dumbbell Lunges</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12 each</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',3)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-3"><span class="ico">🦵</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Step forward, back knee near floor. Front shin vertical. Drive through front heel to return.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-3"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-4" class="ex-card" onclick="toggleCard('a',4)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Incline Dumbbell Press</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',4)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-4"><span class="ico">💪</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>30–45° incline. Arch slightly. Lower to upper chest. Full stretch at bottom.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-4"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-5" class="ex-card" onclick="toggleCard('a',5)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Cable Face Pulls</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>15–20</strong></span><span>Rest: <strong>45s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',5)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-5"><span class="ico">🎯</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Elbows high and wide. Pull to forehead. External rotate at end. Light weight, perfect form.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-5"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">🎯 Abs — 10 min</div>
+  <div id="ex-a-6" class="ex-card" onclick="toggleCard('a',6)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Hanging Leg Raises</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>12–15</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',6)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-6"><span class="ico">🎯</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Dead hang start. Raise legs to 90°. No swinging. Control the descent slowly.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-6"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-7" class="ex-card" onclick="toggleCard('a',7)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Plank Hold</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>45–60s</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',7)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-7"><span class="ico">🧱</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Neutral spine. Squeeze glutes. Don't let hips sag or pike. Breathe steadily.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-7"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-a-8" class="ex-card" onclick="toggleCard('a',8)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Cable Woodchops</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>12 each side</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'a',8)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-a-8"><span class="ico">🌀</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Rotate through core, not arms. Arms stay straight. Full range of motion each rep.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-a-8"></div></div>
+    </div>
+  </div>
+
+  <div class="finish-card">
+    <h3>🏁 FINISH</h3>
+    <div class="finish-item"><span>🧖</span><span>Sauna — 15 min</span></div>
+    <div class="finish-item"><span>🚿</span><span>Cold shower — 2–3 min</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetDay('a')">↺ Reset Day A</button>
+  <div class="complete-banner" id="complete-a"><h2>DAY A DONE 💪</h2><p>Go eat. You earned it.</p></div>
+</div>
+
+<!-- DAY B -->
+<div class="panel" id="panel-b">
+  <div class="hero">
+    <div class="hero-day">B</div>
+    <div class="hero-title">Deadlift · Overhead Press · Pull-Ups</div>
+    <div class="hero-sub">~60–70 min including warm-up, abs, and sauna</div>
+    <div class="hero-pills">
+      <div class="pill">🚣 Row / jump rope</div>
+      <div class="pill">🔥 Compound lifts</div>
+      <div class="pill">💪 Accessory</div>
+      <div class="pill">🎯 Abs 10 min</div>
+    </div>
+  </div>
+  <div id="progress-b" class="progress-bar-wrap">
+    <div class="progress-label"><span>Progress</span><strong id="progress-b-text">0 / 9</strong></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-b-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-label">🔥 Compound Lifts</div>
+  <div id="ex-b-0" class="ex-card" onclick="toggleCard('b',0)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Deadlift</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>6–8</strong></span><span>Rest: <strong>2 min</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',0)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-0"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Bar over mid-foot. Hinge — not squat. Chest up, lats tight. Drive hips through at top.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-0"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-1" class="ex-card" onclick="toggleCard('b',1)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Overhead Press (Barbell)</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',1)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-1"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Bar from upper chest. Head through at top. Glutes and core tight. Full lockout overhead.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-1"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-2" class="ex-card" onclick="toggleCard('b',2)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Weighted Pull-Ups / Lat Pulldown</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',2)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-2"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Full dead hang at bottom. Pull elbows to hips. Chest to bar. No half reps.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-2"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">💪 Accessory Work</div>
+  <div id="ex-b-3" class="ex-card" onclick="toggleCard('b',3)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Romanian Deadlift (DB)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',3)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-3"><span class="ico">🦵</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Soft knee. Push hips back — not down. Feel hamstring stretch. Keep back flat throughout.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-3"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-4" class="ex-card" onclick="toggleCard('b',4)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Dumbbell Lateral Raises</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>12–15</strong></span><span>Rest: <strong>45s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',4)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-4"><span class="ico">💪</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Slight forward lean. Lead with elbows. Stop at shoulder height. Light weight, high reps.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-4"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-5" class="ex-card" onclick="toggleCard('b',5)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Barbell Bicep Curls</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>45s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',5)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-5"><span class="ico">💪</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Elbows pinned to sides. Full range of motion. Squeeze at top. No swinging.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-5"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">🎯 Abs — 10 min</div>
+  <div id="ex-b-6" class="ex-card" onclick="toggleCard('b',6)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Ab Wheel Rollouts</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',6)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-6"><span class="ico">🎯</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Kneel. Roll out slowly. Pull back with core — not arms. Lower back stays flat.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-6"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-7" class="ex-card" onclick="toggleCard('b',7)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Russian Twists (Weighted)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>20 total</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',7)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-7"><span class="ico">🌀</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Lean back 45°. Rotate fully each side. Feet off floor is harder. Hold weight with both hands.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-7"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-b-8" class="ex-card" onclick="toggleCard('b',8)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Dead Bugs</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>12 each side</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'b',8)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-b-8"><span class="ico">🪲</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Lower back flat to floor — always. Opposite arm and leg extend slowly. Breathe out on extension.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-b-8"></div></div>
+    </div>
+  </div>
+
+  <div class="finish-card">
+    <h3>🏁 FINISH</h3>
+    <div class="finish-item"><span>🧖</span><span>Sauna — 15 min</span></div>
+    <div class="finish-item"><span>🚿</span><span>Cold shower — 2–3 min</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetDay('b')">↺ Reset Day B</button>
+  <div class="complete-banner" id="complete-b"><h2>DAY B DONE 💪</h2><p>Go eat. You earned it.</p></div>
+</div>
+
+<!-- DAY C -->
+<div class="panel" id="panel-c">
+  <div class="hero">
+    <div class="hero-day">C</div>
+    <div class="hero-title">Front Squat · Dumbbell Press · Rows</div>
+    <div class="hero-sub">~60–70 min including warm-up, abs, and sauna</div>
+    <div class="hero-pills">
+      <div class="pill">🚶 Incline walk</div>
+      <div class="pill">🔥 Compound lifts</div>
+      <div class="pill">💪 Accessory</div>
+      <div class="pill">🎯 Abs 10 min</div>
+    </div>
+  </div>
+  <div id="progress-c" class="progress-bar-wrap">
+    <div class="progress-label"><span>Progress</span><strong id="progress-c-text">0 / 9</strong></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-c-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-label">🔥 Compound Lifts</div>
+  <div id="ex-c-0" class="ex-card" onclick="toggleCard('c',0)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Front Squat / Goblet Squat</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',0)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-0"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Elbows high. Upright torso. Sit between heels. Core braced throughout.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-0"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-1" class="ex-card" onclick="toggleCard('c',1)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Dumbbell Bench Press (Flat)</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>8–10</strong></span><span>Rest: <strong>90s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',1)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-1"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Full stretch at bottom. Press up and slightly in. Control descent. Greater range than barbell.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-1"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-2" class="ex-card" onclick="toggleCard('c',2)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Cable Row (Seated)</div>
+        <div class="ex-meta"><span>Sets: <strong>4</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',2)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-2"><span class="ico">🏋️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Sit tall. Pull to belly. Squeeze shoulder blades at end. Don't lean back.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-2"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">💪 Accessory Work</div>
+  <div id="ex-c-3" class="ex-card" onclick="toggleCard('c',3)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Bulgarian Split Squat</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10 each</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',3)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-3"><span class="ico">🦵</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Rear foot elevated. Front foot far enough forward. Drop straight down. Don't let knee cave.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-3"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-4" class="ex-card" onclick="toggleCard('c',4)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Dips (BW or Weighted)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',4)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-4"><span class="ico">💪</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Lean forward for chest focus. Full lockout at top. Control descent. Add weight when 12 reps feel easy.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-4"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-5" class="ex-card" onclick="toggleCard('c',5)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Hammer Curls</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10–12</strong></span><span>Rest: <strong>45s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',5)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-5"><span class="ico">💪</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Neutral grip (thumbs up). Elbows pinned. Control the descent. Hits brachialis for arm thickness.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-5"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">🎯 Abs — 10 min</div>
+  <div id="ex-c-6" class="ex-card" onclick="toggleCard('c',6)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Decline Sit-Ups (Weighted)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>15</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',6)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-6"><span class="ico">🎯</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Hold plate to chest. Full range. Don't yank your neck. Control on the way down.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-6"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-7" class="ex-card" onclick="toggleCard('c',7)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Mountain Climbers</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>30 sec</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',7)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-7"><span class="ico">⛰️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>High plank. Drive knees fast alternating. Hips stay level. Core tight throughout.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-7"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-c-8" class="ex-card" onclick="toggleCard('c',8)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Pallof Press (Cable)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>12 each side</strong></span><span>Rest: <strong>30s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'c',8)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-c-8"><span class="ico">🌀</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Stand side-on to cable. Press and hold. Resist rotation. Anti-rotation = strong core.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-c-8"></div></div>
+    </div>
+  </div>
+
+  <div class="finish-card">
+    <h3>🏁 FINISH</h3>
+    <div class="finish-item"><span>🧖</span><span>Sauna — 15 min</span></div>
+    <div class="finish-item"><span>🚿</span><span>Cold shower — 2–3 min</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetDay('c')">↺ Reset Day C</button>
+  <div class="complete-banner" id="complete-c"><h2>DAY C DONE 💪</h2><p>Go eat. You earned it.</p></div>
+</div>
+
+<!-- DAY D -->
+<div class="panel" id="panel-d">
+  <div class="hero">
+    <div class="hero-day">D</div>
+    <div class="hero-title">HIIT + Core</div>
+    <div class="hero-sub">~45–50 min · Optional 4th day — only if energy is there</div>
+    <div class="hero-pills">
+      <div class="pill">⚡ 20 min HIIT</div>
+      <div class="pill">🎯 Core circuit</div>
+      <div class="pill">🧘 10 min stretch</div>
+    </div>
+  </div>
+  <div id="progress-d" class="progress-bar-wrap">
+    <div class="progress-label"><span>Progress</span><strong id="progress-d-text">0 / 6</strong></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-d-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-label">⚡ HIIT Cardio — 20 min</div>
+  <div id="ex-d-0" class="ex-card" onclick="toggleCard('d',0)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Sprint Intervals</div>
+        <div class="ex-meta"><span>Rounds: <strong>8–10</strong></span><span>On: <strong>30s</strong></span><span>Off: <strong>60s</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',0)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-d-0"><span class="ico">💨</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>ALL OUT for 30 sec — not 70%, not 80%. Full recovery for 60 sec. Assault bike works too.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your rounds</div><div class="set-dots" id="sets-d-0"></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">🎯 Core Circuit — 3 Rounds</div>
+  <div id="ex-d-1" class="ex-card" onclick="toggleCard('d',1)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Hanging Knee Raises</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>15</strong></span><span>Rest: <strong>Minimal</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',1)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-d-1"><span class="ico">🎯</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Dead hang start. Knees to chest. Slow on the way down. No swinging.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-d-1"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-d-2" class="ex-card" onclick="toggleCard('d',2)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Side Plank (each side)</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>30–45s</strong></span><span>Rest: <strong>Minimal</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',2)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-d-2"><span class="ico">🧱</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Stack feet or stagger for easier. Hips high — don't sag. Squeeze obliques.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-d-2"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-d-3" class="ex-card" onclick="toggleCard('d',3)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Bicycle Crunches</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>20 total</strong></span><span>Rest: <strong>Minimal</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',3)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-d-3"><span class="ico">🚲</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Elbow to opposite knee. Full rotation each rep. Don't rush. Feel the oblique.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-d-3"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-d-4" class="ex-card" onclick="toggleCard('d',4)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Plank to Push-Up</div>
+        <div class="ex-meta"><span>Sets: <strong>3</strong></span><span>Reps: <strong>10</strong></span><span>Rest: <strong>60s between rounds</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',4)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-gif-placeholder" id="gif-d-4"><span class="ico">⬆️</span>Loading GIF...</div>
+      <div class="cue-box"><strong>Key Cues</strong>Down to forearms and back up. Keep hips level throughout. Alternate leading arm each rep.</div>
+      <div class="set-tracker"><div class="set-tracker-label">Track your sets</div><div class="set-dots" id="sets-d-4"></div></div>
+    </div>
+  </div>
+
+  <div id="ex-d-5" class="ex-card" onclick="toggleCard('d',5)">
+    <div class="ex-card-header">
+      <div class="ex-left">
+        <div class="ex-name">Stretching</div>
+        <div class="ex-meta"><span>Duration: <strong>10 min</strong></span></div>
+      </div>
+      <div class="ex-right">
+        <button class="check-btn" onclick="markDone(event,'d',5)">✓</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="ex-body">
+      <div class="cue-box"><strong>Key Cues</strong>Hip flexors, hamstrings, quads, chest, shoulders. Hold each stretch 30–45 sec.</div>
+    </div>
+  </div>
+
+  <div class="finish-card">
+    <h3>🏁 FINISH</h3>
+    <div class="finish-item"><span>🧖</span><span>Sauna — 15 min</span></div>
+    <div class="finish-item"><span>🚿</span><span>Cold shower — 2–3 min</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetDay('d')">↺ Reset Day D</button>
+  <div class="complete-banner" id="complete-d"><h2>DAY D DONE 💪</h2><p>Optional day. Respect.</p></div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="panel" id="panel-h">
+  <div class="streak-card" id="streak-card">
+    <div class="streak-stat">
+      <div class="streak-num" id="stat-total">—</div>
+      <div class="streak-label">Total Workouts</div>
+    </div>
+    <div class="streak-stat">
+      <div class="streak-num" id="stat-week">—</div>
+      <div class="streak-label">This Week</div>
+    </div>
+    <div class="streak-stat">
+      <div class="streak-num" id="stat-streak">—</div>
+      <div class="streak-label">Day Streak</div>
+    </div>
+  </div>
+  <div class="section-label">📋 Recent Sessions</div>
+  <div id="history-list"><div class="history-empty"><span class="ico">⏳</span>Loading history...</div></div>
+</div>
+
+</div><!-- end content -->
+
+<div class="sync-badge" id="sync-badge">
+  <div class="sync-dot"></div>
+  <span id="sync-text">Ready</span>
+</div>
+
+<script>
+// ---- CONFIG (edit these two lines) ----
+// API_URL and API_KEY are set above in the <script> tag before this one
+
+// ---- API HELPERS ----
+async function apiGet(path) {
+  const res = await fetch(API_URL + path, {
+    headers: { 'x-api-key': API_KEY }
+  });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(API_URL + path, {
+    method: 'POST',
+    headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+async function apiDelete(path) {
+  const res = await fetch(API_URL + path, {
+    method: 'DELETE',
+    headers: { 'x-api-key': API_KEY }
+  });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+function setSyncStatus(status) {
+  const badge = document.getElementById('sync-badge');
+  const text = document.getElementById('sync-text');
+  badge.className = 'sync-badge ' + status;
+  if (status === 'saving') text.textContent = 'Saving...';
+  else if (status === 'saved') { text.textContent = 'Saved ✓'; setTimeout(() => setSyncStatus(''), 2000); }
+  else text.textContent = 'Ready';
+}
+
+// ---- GIF LOADING ----
+const gifMap = {
+  'a-0': 'barbell squat', 'a-1': 'barbell bench press', 'a-2': 'bent over barbell row',
+  'a-3': 'dumbbell lunge', 'a-4': 'incline dumbbell press', 'a-5': 'cable face pull',
+  'a-6': 'hanging leg raise', 'a-7': 'plank', 'a-8': 'cable woodchop',
+  'b-0': 'deadlift', 'b-1': 'barbell overhead press', 'b-2': 'pull up',
+  'b-3': 'romanian deadlift', 'b-4': 'lateral raise', 'b-5': 'barbell curl',
+  'b-6': 'ab wheel', 'b-7': 'russian twist', 'b-8': 'dead bug',
+  'c-0': 'front squat', 'c-1': 'dumbbell bench press', 'c-2': 'seated cable row',
+  'c-3': 'bulgarian split squat', 'c-4': 'dip', 'c-5': 'hammer curl',
+  'c-6': 'decline sit up', 'c-7': 'mountain climber', 'c-8': 'pallof press',
+  'd-0': 'sprint', 'd-1': 'hanging knee raise', 'd-2': 'side plank',
+  'd-3': 'bicycle crunch', 'd-4': 'plank push up',
+};
+const gifCache = {};
+
+async function loadGif(key) {
+  const el = document.getElementById('gif-' + key);
+  if (!el || el.tagName === 'IMG') return;
+  if (gifCache[key]) { showGif(el, gifCache[key]); return; }
+  try {
+    const q = encodeURIComponent(gifMap[key] || '');
+    const r = await fetch(`https://wger.de/api/v2/exercise/search/?term=${q}&language=english&format=json`);
+    const d = await r.json();
+    if (d.suggestions && d.suggestions.length > 0) {
+      const exId = d.suggestions[0].data?.id;
+      if (exId) {
+        const imgRes = await fetch(`https://wger.de/api/v2/exerciseimage/?exercise=${exId}&format=json`);
+        const imgData = await imgRes.json();
+        if (imgData.results && imgData.results.length > 0) {
+          const url = imgData.results[0].image;
+          gifCache[key] = url;
+          showGif(el, url);
+          return;
+        }
+      }
+    }
+  } catch {}
+  el.innerHTML = '<span class="ico">💪</span><span style="font-size:11px">Tap to search on YouTube</span>';
+  el.style.cursor = 'pointer';
+  el.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent((gifMap[key]||'') + ' exercise how to')}`, '_blank');
+}
+
+function showGif(el, url) {
+  const img = document.createElement('img');
+  img.src = url;
+  img.className = 'ex-gif';
+  img.onerror = () => { el.style.display = 'flex'; };
+  el.replaceWith(img);
+}
+
+// ---- STATE ----
+const counts = { a: 9, b: 9, c: 9, d: 6 };
+const done = { a: new Set(), b: new Set(), c: new Set(), d: new Set() };
+const setsDone = {};
+const setSizes = {
+  'a-0':4,'a-1':4,'a-2':4,'a-3':3,'a-4':3,'a-5':3,'a-6':3,'a-7':3,'a-8':3,
+  'b-0':4,'b-1':4,'b-2':4,'b-3':3,'b-4':3,'b-5':3,'b-6':3,'b-7':3,'b-8':3,
+  'c-0':4,'c-1':4,'c-2':4,'c-3':3,'c-4':3,'c-5':3,'c-6':3,'c-7':3,'c-8':3,
+  'd-0':10,'d-1':3,'d-2':3,'d-3':3,'d-4':3,'d-5':1,
+};
+
+// ---- LOAD FROM SERVER ON STARTUP ----
+async function loadProgress() {
+  try {
+    const data = await apiGet('/api/progress');
+    // restore setsDone
+    Object.assign(setsDone, data.setsDone);
+    // restore done sets
+    for (const day of ['a','b','c','d']) {
+      for (const idx of (data.done[day] || [])) {
+        done[day].add(idx);
+      }
+    }
+    // render UI
+    for (const day of ['a','b','c','d']) {
+      for (let i = 0; i < counts[day]; i++) buildSetDots(day, i);
+      // restore done card visual
+      for (const idx of done[day]) {
+        document.getElementById('ex-' + day + '-' + idx)?.classList.add('done');
+      }
+      updateProgress(day);
+    }
+  } catch(e) {
+    console.warn('Could not load progress from server:', e);
+    // fall back to in-memory fresh state
+    for (const day of ['a','b','c','d']) {
+      for (let i = 0; i < counts[day]; i++) buildSetDots(day, i);
+    }
+  }
+}
+
+// ---- SAVE TO SERVER ----
+let saveTimer = null;
+async function saveProgress(key, sets, isDone) {
+  setSyncStatus('saving');
+  try {
+    await apiPost('/api/progress', { key, sets_done: sets, is_done: isDone });
+    setSyncStatus('saved');
+  } catch(e) {
+    console.warn('Save failed:', e);
+    setSyncStatus('');
+  }
+}
+
+function debouncedSave(key, sets, isDone) {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => saveProgress(key, sets, isDone), 600);
+}
+
+// ---- SET DOTS ----
+function buildSetDots(day, idx) {
+  const key = day + '-' + idx;
+  const container = document.getElementById('sets-' + key);
+  if (!container) return;
+  const n = setSizes[key] || 3;
+  if (setsDone[key] === undefined) setsDone[key] = 0;
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'set-dot' + (i < setsDone[key] ? ' done' : '');
+    btn.textContent = i + 1;
+    btn.onclick = (e) => { e.stopPropagation(); toggleSet(day, idx, i, n); };
+    container.appendChild(btn);
+  }
+}
+
+function toggleSet(day, idx, setIdx, total) {
+  const key = day + '-' + idx;
+  const current = setsDone[key] || 0;
+  setsDone[key] = setIdx < current ? setIdx : setIdx + 1;
+  buildSetDots(day, idx);
+  const isDone = setsDone[key] >= total;
+  if (isDone) {
+    done[day].add(idx);
+    document.getElementById('ex-' + key).classList.add('done');
+  } else {
+    done[day].delete(idx);
+    document.getElementById('ex-' + key).classList.remove('done');
+  }
+  updateProgress(day);
+  debouncedSave(key, setsDone[key], isDone);
+}
+
+function markDone(e, day, idx) {
+  e.stopPropagation();
+  const key = day + '-' + idx;
+  const card = document.getElementById('ex-' + key);
+  let isDone;
+  if (done[day].has(idx)) {
+    done[day].delete(idx);
+    card.classList.remove('done');
+    setsDone[key] = 0;
+    isDone = false;
+  } else {
+    done[day].add(idx);
+    card.classList.add('done');
+    setsDone[key] = setSizes[key] || 3;
+    isDone = true;
+  }
+  buildSetDots(day, idx);
+  updateProgress(day);
+  debouncedSave(key, setsDone[key], isDone);
+}
+
+// ---- PROGRESS + LOG ----
+const dayLogged = { a: false, b: false, c: false, d: false };
+
+async function updateProgress(day) {
+  const total = counts[day];
+  const completed = done[day].size;
+  const pct = Math.round((completed / total) * 100);
+  document.getElementById('progress-' + day + '-text').textContent = completed + ' / ' + total;
+  document.getElementById('progress-' + day + '-bar').style.width = pct + '%';
+  const banner = document.getElementById('complete-' + day);
+  if (completed === total) {
+    banner.classList.add('show');
+    if (!dayLogged[day]) {
+      dayLogged[day] = true;
+      try {
+        await apiPost('/api/log', { day, exercises_done: completed, total_exercises: total });
+      } catch(e) { console.warn('Log failed:', e); }
+    }
+  } else {
+    banner.classList.remove('show');
+    dayLogged[day] = false;
+  }
+}
+
+// ---- RESET DAY ----
+async function resetDay(day) {
+  if (!confirm(`Reset all of Day ${day.toUpperCase()}?`)) return;
+  setSyncStatus('saving');
+  try {
+    await apiDelete('/api/progress/day/' + day);
+    done[day].clear();
+    for (let i = 0; i < counts[day]; i++) {
+      const key = day + '-' + i;
+      setsDone[key] = 0;
+      document.getElementById('ex-' + key)?.classList.remove('done');
+    }
+    for (let i = 0; i < counts[day]; i++) buildSetDots(day, i);
+    await updateProgress(day);
+    setSyncStatus('saved');
+  } catch(e) {
+    console.warn('Reset failed:', e);
+    setSyncStatus('');
+  }
+}
+
+// ---- TOGGLE CARD ----
+function toggleCard(day, idx) {
+  const key = day + '-' + idx;
+  const card = document.getElementById('ex-' + key);
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.ex-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) {
+    card.classList.add('open');
+    loadGif(key);
+    buildSetDots(day, idx);
+  }
+}
+
+// ---- SWITCH DAY ----
+function switchDay(day) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.tab');
+  const idx = ['a','b','c','d','h'].indexOf(day);
+  if (tabs[idx]) tabs[idx].classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + day).classList.add('active');
+  document.querySelectorAll('.ex-card.open').forEach(c => c.classList.remove('open'));
+  window.scrollTo(0, 0);
+  if (day === 'h') loadHistory();
+}
+
+// ---- HISTORY ----
+async function loadHistory() {
+  const el = document.getElementById('history-list');
+  try {
+    const rows = await apiGet('/api/history');
+    if (!rows.length) {
+      el.innerHTML = '<div class="history-empty"><span class="ico">🏋️</span>No workouts yet. Get after it!</div>';
+      document.getElementById('stat-total').textContent = '0';
+      document.getElementById('stat-week').textContent = '0';
+      document.getElementById('stat-streak').textContent = '0';
+      return;
+    }
+
+    // Stats
+    document.getElementById('stat-total').textContent = rows.length;
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0,0,0,0);
+    const thisWeek = rows.filter(r => new Date(r.logged_at) >= weekStart).length;
+    document.getElementById('stat-week').textContent = thisWeek;
+
+    // Streak: count consecutive days with at least 1 workout (backwards from today)
+    const daySet = new Set(rows.map(r => new Date(r.logged_at).toDateString()));
+    let streak = 0, d = new Date();
+    while (daySet.has(d.toDateString())) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    document.getElementById('stat-streak').textContent = streak;
+
+    // List
+    const dayNames = { a: 'Squat Day', b: 'Deadlift Day', c: 'Front Squat Day', d: 'HIIT Day' };
+    el.innerHTML = rows.map(r => {
+      const pct = Math.round((r.exercises_done / r.total_exercises) * 100);
+      const date = new Date(r.logged_at);
+      const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="history-entry">
+          <div class="history-day-badge">${r.day.toUpperCase()}</div>
+          <div class="history-info">
+            <div class="history-date">${dayNames[r.day] || 'Day ' + r.day.toUpperCase()}</div>
+            <div class="history-meta">${dateStr} · ${timeStr} · ${r.exercises_done}/${r.total_exercises} exercises</div>
+            <div class="history-bar"><div class="history-bar-fill" style="width:${pct}%"></div></div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="history-empty"><span class="ico">⚠️</span>Could not load history.</div>';
+  }
+}
+
+// ---- INIT ----
+loadProgress();
+</script>
+</body>
+</html>
