@@ -37,6 +37,15 @@ async function initDB() {
       total_exercises INTEGER NOT NULL,
       logged_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS diary (
+      id SERIAL PRIMARY KEY,
+      entry_date DATE NOT NULL,
+      workout_type CHAR(1) NOT NULL,
+      notes TEXT DEFAULT '',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(entry_date, workout_type)
+    );
   `);
   console.log('DB ready');
 }
@@ -89,6 +98,39 @@ app.get('/api/history', auth, async (req, res) => {
     LIMIT 30
   `);
   res.json(rows);
+});
+
+// GET /api/diary?month=YYYY-MM — get diary entries for a month
+app.get('/api/diary', auth, async (req, res) => {
+  const month = req.query.month; // e.g. "2026-03"
+  if (!month) return res.status(400).json({ error: 'month query param required (YYYY-MM)' });
+  const { rows } = await pool.query(`
+    SELECT id, entry_date, workout_type, notes
+    FROM diary
+    WHERE TO_CHAR(entry_date, 'YYYY-MM') = $1
+    ORDER BY entry_date ASC
+  `, [month]);
+  res.json(rows);
+});
+
+// POST /api/diary — add a diary entry
+app.post('/api/diary', auth, async (req, res) => {
+  const { entry_date, workout_type, notes } = req.body;
+  if (!entry_date || !workout_type) return res.status(400).json({ error: 'entry_date and workout_type required' });
+  const { rows } = await pool.query(`
+    INSERT INTO diary (entry_date, workout_type, notes)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (entry_date, workout_type) DO UPDATE
+      SET notes = $3
+    RETURNING id, entry_date, workout_type, notes
+  `, [entry_date, workout_type, notes || '']);
+  res.json(rows[0]);
+});
+
+// DELETE /api/diary/:id — remove a diary entry
+app.delete('/api/diary/:id', auth, async (req, res) => {
+  await pool.query('DELETE FROM diary WHERE id = $1', [req.params.id]);
+  res.json({ ok: true });
 });
 
 // DELETE /api/progress/day/:day — reset a day (clear all exercises)

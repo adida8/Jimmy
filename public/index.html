@@ -370,6 +370,224 @@ body {
 .streak-stat { flex: 1; text-align: center; }
 .streak-num { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--red); line-height: 1; }
 .streak-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* DIARY */
+.diary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.diary-month {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+.diary-nav {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.diary-nav:hover { border-color: var(--red); color: var(--red); }
+.diary-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.diary-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.diary-cell {
+  aspect-ratio: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  min-height: 48px;
+}
+.diary-cell:hover { border-color: var(--red); }
+.diary-cell.today { border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
+.diary-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+.diary-cell.empty:hover { border-color: transparent; }
+.diary-cell .day-num { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1; }
+.diary-cell.empty .day-num { color: transparent; }
+.diary-cell .diary-dots {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.diary-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.diary-dot.type-a { background: var(--red); }
+.diary-dot.type-b { background: #3498db; }
+.diary-dot.type-c { background: var(--green); }
+.diary-dot.type-d { background: #f39c12; }
+
+/* DIARY MODAL */
+.diary-modal-bg {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: flex-end;
+  justify-content: center;
+}
+.diary-modal-bg.show { display: flex; animation: fadeIn 0.2s ease; }
+.diary-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 36px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.diary-modal-date {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--red);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.diary-modal-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.diary-type-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.diary-type-btn {
+  background: var(--card2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.diary-type-btn .big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  display: block;
+  line-height: 1.2;
+  color: var(--text);
+}
+.diary-type-btn.selected { border-color: var(--red); background: rgba(233,69,96,0.15); color: var(--text); }
+.diary-notes {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 12px;
+  resize: none;
+  margin-bottom: 14px;
+}
+.diary-notes::placeholder { color: var(--muted); }
+.diary-notes:focus { outline: none; border-color: var(--red); }
+.diary-save-btn {
+  width: 100%;
+  background: var(--red);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.diary-save-btn:hover { opacity: 0.85; }
+.diary-entries-list { margin-top: 16px; }
+.diary-entry-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.diary-entry-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  width: 24px;
+  text-align: center;
+}
+.diary-entry-badge.type-a { color: var(--red); }
+.diary-entry-badge.type-b { color: #3498db; }
+.diary-entry-badge.type-c { color: var(--green); }
+.diary-entry-badge.type-d { color: #f39c12; }
+.diary-entry-info { flex: 1; }
+.diary-entry-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.diary-entry-notes { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.diary-entry-del {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.diary-entry-del:hover { border-color: var(--red); color: var(--red); }
+
+/* DIARY LEGEND */
+.diary-legend {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.diary-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted);
+}
 </style>
 </head>
 <body>
@@ -390,6 +608,7 @@ body {
     <button class="tab" onclick="switchDay('b')"><span class="big">B</span>Deadlift</button>
     <button class="tab" onclick="switchDay('c')"><span class="big">C</span>Front Sq</button>
     <button class="tab" onclick="switchDay('d')"><span class="big">D</span>HIIT</button>
+    <button class="tab" onclick="switchDay('diary')"><span class="big">📓</span>Diary</button>
     <button class="tab" onclick="switchDay('h')"><span class="big">📅</span>History</button>
   </div>
 </div>
@@ -1106,6 +1325,42 @@ body {
   <div class="complete-banner" id="complete-d"><h2>DAY D DONE 💪</h2><p>Optional day. Respect.</p></div>
 </div>
 
+<!-- DIARY PANEL -->
+<div class="panel" id="panel-diary">
+  <div class="diary-header">
+    <button class="diary-nav" onclick="diaryPrevMonth()">◀</button>
+    <div class="diary-month" id="diary-month-label">March 2026</div>
+    <button class="diary-nav" onclick="diaryNextMonth()">▶</button>
+  </div>
+  <div class="diary-weekdays">
+    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+  </div>
+  <div class="diary-grid" id="diary-grid"></div>
+  <div class="diary-legend">
+    <div class="diary-legend-item"><div class="diary-dot type-a"></div> A · Squat</div>
+    <div class="diary-legend-item"><div class="diary-dot type-b"></div> B · Deadlift</div>
+    <div class="diary-legend-item"><div class="diary-dot type-c"></div> C · Front Sq</div>
+    <div class="diary-legend-item"><div class="diary-dot type-d"></div> D · HIIT</div>
+  </div>
+
+  <!-- Modal for adding/viewing a diary entry -->
+  <div class="diary-modal-bg" id="diary-modal-bg" onclick="closeDiaryModal()">
+    <div class="diary-modal" onclick="event.stopPropagation()">
+      <div class="diary-modal-date" id="diary-modal-date">14 Mar 2026</div>
+      <div class="diary-modal-label">What did you do?</div>
+      <div class="diary-type-btns" id="diary-type-btns">
+        <button class="diary-type-btn" data-type="a" onclick="selectDiaryType('a')"><span class="big">A</span>Squat</button>
+        <button class="diary-type-btn" data-type="b" onclick="selectDiaryType('b')"><span class="big">B</span>Deadlift</button>
+        <button class="diary-type-btn" data-type="c" onclick="selectDiaryType('c')"><span class="big">C</span>Front Sq</button>
+        <button class="diary-type-btn" data-type="d" onclick="selectDiaryType('d')"><span class="big">D</span>HIIT</button>
+      </div>
+      <textarea class="diary-notes" id="diary-notes" placeholder="Notes (optional)..." rows="3"></textarea>
+      <button class="diary-save-btn" id="diary-save-btn" onclick="saveDiaryEntry()">Save</button>
+      <div class="diary-entries-list" id="diary-entries-list"></div>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORY PANEL -->
 <div class="panel" id="panel-h">
   <div class="streak-card" id="streak-card">
@@ -1401,13 +1656,159 @@ function toggleCard(day, idx) {
 function switchDay(day) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   const tabs = document.querySelectorAll('.tab');
-  const idx = ['a','b','c','d','h'].indexOf(day);
+  const idx = ['a','b','c','d','diary','h'].indexOf(day);
   if (tabs[idx]) tabs[idx].classList.add('active');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + day).classList.add('active');
   document.querySelectorAll('.ex-card.open').forEach(c => c.classList.remove('open'));
   window.scrollTo(0, 0);
   if (day === 'h') loadHistory();
+  if (day === 'diary') renderDiary();
+}
+
+// ---- DIARY ----
+let diaryYear = new Date().getFullYear();
+let diaryMonth = new Date().getMonth(); // 0-indexed
+let diaryData = []; // entries for current month
+let selectedDiaryDate = null;
+let selectedDiaryType = null;
+
+const dayNames = { a: 'Squat Day', b: 'Deadlift Day', c: 'Front Squat Day', d: 'HIIT Day' };
+
+function diaryMonthStr() {
+  return diaryYear + '-' + String(diaryMonth + 1).padStart(2, '0');
+}
+
+function diaryPrevMonth() {
+  diaryMonth--;
+  if (diaryMonth < 0) { diaryMonth = 11; diaryYear--; }
+  renderDiary();
+}
+
+function diaryNextMonth() {
+  diaryMonth++;
+  if (diaryMonth > 11) { diaryMonth = 0; diaryYear++; }
+  renderDiary();
+}
+
+async function renderDiary() {
+  const label = document.getElementById('diary-month-label');
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  label.textContent = monthNames[diaryMonth] + ' ' + diaryYear;
+
+  // Fetch data
+  try {
+    diaryData = await apiGet('/api/diary?month=' + diaryMonthStr());
+  } catch(e) {
+    diaryData = [];
+  }
+
+  // Build calendar grid
+  const grid = document.getElementById('diary-grid');
+  const firstDay = new Date(diaryYear, diaryMonth, 1);
+  const lastDate = new Date(diaryYear, diaryMonth + 1, 0).getDate();
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon=0
+
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+  let html = '';
+  // Empty cells before first day
+  for (let i = 0; i < startDow; i++) {
+    html += '<div class="diary-cell empty"><span class="day-num"></span></div>';
+  }
+  // Day cells
+  for (let d = 1; d <= lastDate; d++) {
+    const dateStr = diaryYear + '-' + String(diaryMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isToday = dateStr === todayStr;
+    const entries = diaryData.filter(e => e.entry_date === dateStr || e.entry_date?.startsWith(dateStr));
+    const dots = entries.map(e => '<div class="diary-dot type-' + e.workout_type + '"></div>').join('');
+    html += '<div class="diary-cell' + (isToday ? ' today' : '') + '" onclick="openDiaryModal(\'' + dateStr + '\')">'
+      + '<span class="day-num">' + d + '</span>'
+      + (dots ? '<div class="diary-dots">' + dots + '</div>' : '')
+      + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function openDiaryModal(dateStr) {
+  selectedDiaryDate = dateStr;
+  selectedDiaryType = null;
+  const parts = dateStr.split('-');
+  const d = new Date(parts[0], parts[1]-1, parts[2]);
+  document.getElementById('diary-modal-date').textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+  document.getElementById('diary-notes').value = '';
+  document.querySelectorAll('.diary-type-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('diary-modal-bg').classList.add('show');
+  renderDiaryEntries(dateStr);
+}
+
+function closeDiaryModal() {
+  document.getElementById('diary-modal-bg').classList.remove('show');
+}
+
+function selectDiaryType(type) {
+  selectedDiaryType = type;
+  document.querySelectorAll('.diary-type-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.type === type);
+  });
+}
+
+async function saveDiaryEntry() {
+  if (!selectedDiaryType) return;
+  setSyncStatus('saving');
+  try {
+    await apiPost('/api/diary', {
+      entry_date: selectedDiaryDate,
+      workout_type: selectedDiaryType,
+      notes: document.getElementById('diary-notes').value.trim()
+    });
+    setSyncStatus('saved');
+    document.getElementById('diary-notes').value = '';
+    selectedDiaryType = null;
+    document.querySelectorAll('.diary-type-btn').forEach(b => b.classList.remove('selected'));
+    // Refresh data
+    diaryData = await apiGet('/api/diary?month=' + diaryMonthStr());
+    renderDiary();
+    renderDiaryEntries(selectedDiaryDate);
+  } catch(e) {
+    console.warn('Diary save failed:', e);
+    setSyncStatus('');
+  }
+}
+
+function renderDiaryEntries(dateStr) {
+  const list = document.getElementById('diary-entries-list');
+  const entries = diaryData.filter(e => e.entry_date === dateStr || e.entry_date?.startsWith(dateStr));
+  if (!entries.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">No workouts logged for this day</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => `
+    <div class="diary-entry-item">
+      <div class="diary-entry-badge type-${e.workout_type}">${e.workout_type.toUpperCase()}</div>
+      <div class="diary-entry-info">
+        <div class="diary-entry-name">${dayNames[e.workout_type] || 'Workout'}</div>
+        ${e.notes ? '<div class="diary-entry-notes">' + e.notes + '</div>' : ''}
+      </div>
+      <button class="diary-entry-del" onclick="deleteDiaryEntry(${e.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+async function deleteDiaryEntry(id) {
+  setSyncStatus('saving');
+  try {
+    await apiDelete('/api/diary/' + id);
+    diaryData = diaryData.filter(e => e.id !== id);
+    renderDiary();
+    renderDiaryEntries(selectedDiaryDate);
+    setSyncStatus('saved');
+  } catch(e) {
+    console.warn('Delete failed:', e);
+    setSyncStatus('');
+  }
 }
 
 // ---- HISTORY ----
