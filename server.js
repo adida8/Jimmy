@@ -105,7 +105,7 @@ app.get('/api/diary', auth, async (req, res) => {
   const month = req.query.month; // e.g. "2026-03"
   if (!month) return res.status(400).json({ error: 'month query param required (YYYY-MM)' });
   const { rows } = await pool.query(`
-    SELECT id, entry_date, workout_type, notes
+    SELECT id, TO_CHAR(entry_date, 'YYYY-MM-DD') as entry_date, workout_type, notes
     FROM diary
     WHERE TO_CHAR(entry_date, 'YYYY-MM') = $1
     ORDER BY entry_date ASC
@@ -122,7 +122,7 @@ app.post('/api/diary', auth, async (req, res) => {
     VALUES ($1, $2, $3)
     ON CONFLICT (entry_date, workout_type) DO UPDATE
       SET notes = $3
-    RETURNING id, entry_date, workout_type, notes
+    RETURNING id, TO_CHAR(entry_date, 'YYYY-MM-DD') as entry_date, workout_type, notes
   `, [entry_date, workout_type, notes || '']);
   res.json(rows[0]);
 });

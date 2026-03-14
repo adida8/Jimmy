@@ -409,13 +409,12 @@ body {
 .diary-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 4px;
 }
 .diary-cell {
-  aspect-ratio: 1;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -423,7 +422,8 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  min-height: 48px;
+  padding: 8px 2px;
+  min-height: 44px;
 }
 .diary-cell:hover { border-color: var(--red); }
 .diary-cell.today { border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
@@ -439,7 +439,7 @@ body {
   justify-content: center;
 }
 .diary-dot {
-  width: 7px; height: 7px;
+  width: 6px; height: 6px;
   border-radius: 50%;
 }
 .diary-dot.type-a { background: var(--red); }
@@ -592,15 +592,20 @@ body {
 </head>
 <body>
 
-<!-- CONFIG: set these to match your Railway deployment -->
+<!-- CONFIG -->
 <script>
-  const API_URL = '';        // leave empty — same origin. If separate: 'https://your-app.railway.app'
-  const API_KEY = 'CHANGE_ME'; // must match the API_KEY env var in Railway
+  const API_URL = '';
+  const API_KEY = new URLSearchParams(window.location.search).get('key') || localStorage.getItem('jimmy_key') || '';
+  if (API_KEY) localStorage.setItem('jimmy_key', API_KEY);
+  if (!API_KEY) {
+    const k = prompt('Enter your API key:');
+    if (k) { localStorage.setItem('jimmy_key', k); location.reload(); }
+  }
 </script>
 
 <div class="header">
   <div class="header-top">
-    <div class="logo">6-PACK <span>BY SUMMER</span></div>
+    <div class="logo">JIMMY</div>
     <div class="target-pill">Target: <strong>12–15% BF</strong></div>
   </div>
   <div class="tabs">
@@ -1699,6 +1704,8 @@ async function renderDiary() {
   // Fetch data
   try {
     diaryData = await apiGet('/api/diary?month=' + diaryMonthStr());
+    // Normalize entry_date from Postgres (may be "2026-03-14T00:00:00.000Z")
+    diaryData.forEach(e => { e.entry_date = e.entry_date?.substring(0, 10); });
   } catch(e) {
     diaryData = [];
   }
@@ -1722,7 +1729,7 @@ async function renderDiary() {
   for (let d = 1; d <= lastDate; d++) {
     const dateStr = diaryYear + '-' + String(diaryMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     const isToday = dateStr === todayStr;
-    const entries = diaryData.filter(e => e.entry_date === dateStr || e.entry_date?.startsWith(dateStr));
+    const entries = diaryData.filter(e => e.entry_date === dateStr);
     const dots = entries.map(e => '<div class="diary-dot type-' + e.workout_type + '"></div>').join('');
     html += '<div class="diary-cell' + (isToday ? ' today' : '') + '" onclick="openDiaryModal(\'' + dateStr + '\')">'
       + '<span class="day-num">' + d + '</span>'
@@ -1780,7 +1787,7 @@ async function saveDiaryEntry() {
 
 function renderDiaryEntries(dateStr) {
   const list = document.getElementById('diary-entries-list');
-  const entries = diaryData.filter(e => e.entry_date === dateStr || e.entry_date?.startsWith(dateStr));
+  const entries = diaryData.filter(e => e.entry_date === dateStr);
   if (!entries.length) {
     list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">No workouts logged for this day</div>';
     return;
