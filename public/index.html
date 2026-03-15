@@ -655,24 +655,37 @@ body {
   width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;
 }
 .food-photo-zone {
-  width: 100%; min-height: 140px;
+  width: 100%; min-height: 100px;
   background: var(--card2); border: 2px dashed var(--border);
   border-radius: 14px; display: flex;
   align-items: center; justify-content: center;
   flex-direction: column; gap: 8px;
-  cursor: pointer; margin-bottom: 16px;
+  margin-bottom: 16px;
   overflow: hidden; position: relative;
+  padding: 16px;
 }
-.food-photo-zone:hover { border-color: var(--red); }
-.food-photo-zone .ico { font-size: 32px; color: var(--muted); }
-.food-photo-zone .label { font-size: 13px; color: var(--muted); }
+.food-photo-btns {
+  display: flex; gap: 10px; width: 100%;
+}
+.food-capture-btn {
+  flex: 1; padding: 16px 12px;
+  background: var(--red); border: none; border-radius: 12px;
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.food-capture-btn:hover { opacity: 0.85; }
+.food-capture-btn.secondary {
+  background: transparent; border: 1.5px solid var(--border);
+  color: var(--muted);
+}
+.food-capture-btn.secondary:hover { border-color: var(--red); color: var(--text); }
 .food-photo-preview {
   width: 100%; max-height: 200px; object-fit: cover;
   border-radius: 12px; display: none;
 }
-.food-photo-zone.has-photo { border-style: solid; border-color: var(--border); }
-.food-photo-zone.has-photo .ico,
-.food-photo-zone.has-photo .label { display: none; }
+.food-photo-zone.has-photo { border-style: solid; border-color: var(--border); padding: 0; }
+.food-photo-zone.has-photo .food-photo-btns { display: none; }
 .food-photo-zone.has-photo .food-photo-preview { display: block; }
 
 /* FOOD ANALYSIS RESULT */
@@ -1514,12 +1527,15 @@ body {
 <div class="food-sheet-bg" id="food-sheet-bg" onclick="if(event.target===this)closeFoodSheet()">
   <div class="food-sheet">
     <div class="diary-modal-date" style="margin-bottom:16px;">Log a meal</div>
-    <div class="food-photo-zone" id="food-photo-zone" onclick="document.getElementById('food-file-input').click()">
-      <span class="ico">📸</span>
-      <span class="label">Tap to take or upload a photo</span>
+    <div class="food-photo-zone" id="food-photo-zone">
+      <div class="food-photo-btns" id="food-photo-btns">
+        <button class="food-capture-btn" onclick="document.getElementById('food-camera-input').click()">📸 Take Photo</button>
+        <button class="food-capture-btn secondary" onclick="document.getElementById('food-file-input').click()">🖼️ Upload</button>
+      </div>
       <img class="food-photo-preview" id="food-photo-preview">
     </div>
-    <input type="file" id="food-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleFoodPhoto(this)">
+    <input type="file" id="food-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleFoodPhoto(this)">
+    <input type="file" id="food-file-input" accept="image/*" style="display:none" onchange="handleFoodPhoto(this)">
     <div class="food-spinner" id="food-spinner">
       🔍 Checking ingredients<span class="dots"></span>
     </div>
@@ -2149,6 +2165,7 @@ function openFoodSheet() {
   document.getElementById('food-analysis').classList.remove('show');
   document.getElementById('food-notes').value = '';
   document.getElementById('food-file-input').value = '';
+  document.getElementById('food-camera-input').value = '';
   document.getElementById('food-sheet-bg').classList.add('show');
 }
 
