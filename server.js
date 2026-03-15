@@ -12,14 +12,6 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-// Simple API key protection — set API_KEY env var in Railway
-const API_KEY = process.env.API_KEY || 'dev-key';
-function auth(req, res, next) {
-  const key = req.headers['x-api-key'] || req.query.key;
-  if (key !== API_KEY) return res.status(401).json({ error: 'Unauthorized' });
-  next();
-}
-
 // DB setup
 async function initDB() {
   await pool.query(`
@@ -51,7 +43,7 @@ async function initDB() {
 }
 
 // GET /api/progress — load all saved exercise state
-app.get('/api/progress', auth, async (req, res) => {
+app.get('/api/progress',async (req, res) => {
   const { rows } = await pool.query('SELECT key, sets_done, is_done FROM progress');
   const setsDone = {};
   const done = { a: [], b: [], c: [], d: [] };
@@ -67,7 +59,7 @@ app.get('/api/progress', auth, async (req, res) => {
 });
 
 // POST /api/progress — save a single exercise state
-app.post('/api/progress', auth, async (req, res) => {
+app.post('/api/progress',async (req, res) => {
   const { key, sets_done, is_done } = req.body;
   if (!key) return res.status(400).json({ error: 'key required' });
   await pool.query(`
@@ -80,7 +72,7 @@ app.post('/api/progress', auth, async (req, res) => {
 });
 
 // POST /api/log — called when a full day is completed
-app.post('/api/log', auth, async (req, res) => {
+app.post('/api/log',async (req, res) => {
   const { day, exercises_done, total_exercises } = req.body;
   await pool.query(
     'INSERT INTO workout_log (day, exercises_done, total_exercises) VALUES ($1, $2, $3)',
@@ -90,7 +82,7 @@ app.post('/api/log', auth, async (req, res) => {
 });
 
 // GET /api/history — last 30 workout sessions
-app.get('/api/history', auth, async (req, res) => {
+app.get('/api/history',async (req, res) => {
   const { rows } = await pool.query(`
     SELECT id, day, exercises_done, total_exercises, logged_at
     FROM workout_log
@@ -101,7 +93,7 @@ app.get('/api/history', auth, async (req, res) => {
 });
 
 // GET /api/diary?month=YYYY-MM — get diary entries for a month
-app.get('/api/diary', auth, async (req, res) => {
+app.get('/api/diary',async (req, res) => {
   const month = req.query.month; // e.g. "2026-03"
   if (!month) return res.status(400).json({ error: 'month query param required (YYYY-MM)' });
   const { rows } = await pool.query(`
@@ -114,7 +106,7 @@ app.get('/api/diary', auth, async (req, res) => {
 });
 
 // POST /api/diary — add a diary entry
-app.post('/api/diary', auth, async (req, res) => {
+app.post('/api/diary',async (req, res) => {
   const { entry_date, workout_type, notes } = req.body;
   if (!entry_date || !workout_type) return res.status(400).json({ error: 'entry_date and workout_type required' });
   const { rows } = await pool.query(`
@@ -128,13 +120,13 @@ app.post('/api/diary', auth, async (req, res) => {
 });
 
 // DELETE /api/diary/:id — remove a diary entry
-app.delete('/api/diary/:id', auth, async (req, res) => {
+app.delete('/api/diary/:id',async (req, res) => {
   await pool.query('DELETE FROM diary WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
 // DELETE /api/progress/day/:day — reset a day (clear all exercises)
-app.delete('/api/progress/day/:day', auth, async (req, res) => {
+app.delete('/api/progress/day/:day',async (req, res) => {
   const day = req.params.day;
   await pool.query("UPDATE progress SET sets_done = 0, is_done = FALSE WHERE key LIKE $1", [`${day}-%`]);
   res.json({ ok: true });

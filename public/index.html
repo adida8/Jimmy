@@ -595,12 +595,6 @@ body {
 <!-- CONFIG -->
 <script>
   const API_URL = '';
-  const API_KEY = new URLSearchParams(window.location.search).get('key') || localStorage.getItem('jimmy_key') || '';
-  if (API_KEY) localStorage.setItem('jimmy_key', API_KEY);
-  if (!API_KEY) {
-    const k = prompt('Enter your API key:');
-    if (k) { localStorage.setItem('jimmy_key', k); location.reload(); }
-  }
 </script>
 
 <div class="header">
@@ -1394,14 +1388,9 @@ body {
 </div>
 
 <script>
-// ---- CONFIG (edit these two lines) ----
-// API_URL and API_KEY are set above in the <script> tag before this one
-
 // ---- API HELPERS ----
 async function apiGet(path) {
-  const res = await fetch(API_URL + path, {
-    headers: { 'x-api-key': API_KEY }
-  });
+  const res = await fetch(API_URL + path);
   if (!res.ok) throw new Error(res.status);
   return res.json();
 }
@@ -1409,7 +1398,7 @@ async function apiGet(path) {
 async function apiPost(path, body) {
   const res = await fetch(API_URL + path, {
     method: 'POST',
-    headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(res.status);
@@ -1418,8 +1407,7 @@ async function apiPost(path, body) {
 
 async function apiDelete(path) {
   const res = await fetch(API_URL + path, {
-    method: 'DELETE',
-    headers: { 'x-api-key': API_KEY }
+    method: 'DELETE'
   });
   if (!res.ok) throw new Error(res.status);
   return res.json();
