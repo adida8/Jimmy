@@ -654,39 +654,31 @@ body {
   border-radius: 20px 20px 0 0; padding: 24px 20px 36px;
   width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;
 }
-.food-photo-zone {
-  width: 100%; min-height: 100px;
-  background: var(--card2); border: 2px dashed var(--border);
-  border-radius: 14px; display: flex;
-  align-items: center; justify-content: center;
-  flex-direction: column; gap: 8px;
-  margin-bottom: 16px;
-  overflow: hidden; position: relative;
-  padding: 16px;
-}
 .food-photo-btns {
-  display: flex; gap: 10px; width: 100%;
+  display: flex; gap: 10px; width: 100%; margin-bottom: 16px;
 }
 .food-capture-btn {
-  flex: 1; padding: 16px 12px;
+  flex: 1; padding: 18px 12px;
   background: var(--red); border: none; border-radius: 12px;
   color: white; font-family: 'DM Sans', sans-serif;
-  font-weight: 700; font-size: 15px; cursor: pointer;
+  font-weight: 700; font-size: 16px; cursor: pointer;
   transition: opacity 0.2s;
+  -webkit-appearance: none;
 }
 .food-capture-btn:hover { opacity: 0.85; }
 .food-capture-btn.secondary {
-  background: transparent; border: 1.5px solid var(--border);
-  color: var(--muted);
+  background: var(--card2); border: 2px solid var(--border);
+  color: var(--text);
 }
-.food-capture-btn.secondary:hover { border-color: var(--red); color: var(--text); }
-.food-photo-preview {
-  width: 100%; max-height: 200px; object-fit: cover;
-  border-radius: 12px; display: none;
+.food-capture-btn.secondary:hover { border-color: var(--red); color: var(--red); }
+.food-photo-preview-wrap {
+  display: none; margin-bottom: 16px; width: 100%;
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
 }
-.food-photo-zone.has-photo { border-style: solid; border-color: var(--border); padding: 0; }
-.food-photo-zone.has-photo .food-photo-btns { display: none; }
-.food-photo-zone.has-photo .food-photo-preview { display: block; }
+.food-photo-preview-wrap.show { display: block; }
+.food-photo-preview-wrap img {
+  width: 100%; max-height: 200px; object-fit: cover; display: block;
+}
 
 /* FOOD ANALYSIS RESULT */
 .food-analysis { display: none; margin-bottom: 16px; }
@@ -1527,15 +1519,15 @@ body {
 <div class="food-sheet-bg" id="food-sheet-bg" onclick="if(event.target===this)closeFoodSheet()">
   <div class="food-sheet">
     <div class="diary-modal-date" style="margin-bottom:16px;">Log a meal</div>
-    <div class="food-photo-zone" id="food-photo-zone">
-      <div class="food-photo-btns" id="food-photo-btns">
-        <button class="food-capture-btn" onclick="document.getElementById('food-camera-input').click()">📸 Take Photo</button>
-        <button class="food-capture-btn secondary" onclick="document.getElementById('food-file-input').click()">🖼️ Upload</button>
-      </div>
-      <img class="food-photo-preview" id="food-photo-preview">
+    <div class="food-photo-btns" id="food-photo-btns">
+      <button class="food-capture-btn" onclick="document.getElementById('food-camera-input').click()">📸 Camera</button>
+      <button class="food-capture-btn secondary" onclick="document.getElementById('food-file-input').click()">🖼️ Gallery</button>
     </div>
     <input type="file" id="food-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleFoodPhoto(this)">
     <input type="file" id="food-file-input" accept="image/*" style="display:none" onchange="handleFoodPhoto(this)">
+    <div class="food-photo-preview-wrap" id="food-photo-preview-wrap">
+      <img id="food-photo-preview">
+    </div>
     <div class="food-spinner" id="food-spinner">
       🔍 Checking ingredients<span class="dots"></span>
     </div>
@@ -2159,8 +2151,8 @@ function openFoodSheet() {
   foodAnalysis = null;
   foodImageBase64 = null;
   foodImageMime = null;
-  document.getElementById('food-photo-zone').classList.remove('has-photo');
-  document.getElementById('food-photo-preview').style.display = 'none';
+  document.getElementById('food-photo-btns').style.display = 'flex';
+  document.getElementById('food-photo-preview-wrap').classList.remove('show');
   document.getElementById('food-spinner').classList.remove('show');
   document.getElementById('food-analysis').classList.remove('show');
   document.getElementById('food-notes').value = '';
@@ -2183,8 +2175,8 @@ async function handleFoodPhoto(input) {
     // Show preview
     const preview = document.getElementById('food-photo-preview');
     preview.src = dataUrl;
-    preview.style.display = 'block';
-    document.getElementById('food-photo-zone').classList.add('has-photo');
+    document.getElementById('food-photo-btns').style.display = 'none';
+    document.getElementById('food-photo-preview-wrap').classList.add('show');
 
     // Extract base64
     const base64 = dataUrl.split(',')[1];
