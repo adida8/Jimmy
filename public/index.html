@@ -588,6 +588,143 @@ body {
   font-size: 11px;
   color: var(--muted);
 }
+
+/* FOOD TAB */
+.food-score {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.food-score-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; }
+.food-score-num.clean { color: var(--green); }
+.food-score-num.mixed { color: #f39c12; }
+.food-score-num.off { color: var(--red); }
+.food-score-verdict { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.food-meal-group { margin-bottom: 16px; }
+.food-meal-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding-left: 2px;
+}
+.food-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.food-entry-icon { font-size: 20px; flex-shrink: 0; }
+.food-entry-info { flex: 1; }
+.food-entry-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.food-entry-verdict { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.food-entry-del {
+  background: none; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted); font-size: 14px; padding: 4px 8px; cursor: pointer;
+}
+.food-entry-del:hover { border-color: var(--red); color: var(--red); }
+.food-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+.food-empty .ico { font-size: 36px; display: block; margin-bottom: 10px; }
+
+/* FOOD FAB */
+.food-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 56px; height: 56px;
+  background: var(--red); border: none; border-radius: 50%;
+  color: white; font-size: 28px; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(233,69,96,0.4);
+  z-index: 150; display: none;
+  align-items: center; justify-content: center;
+}
+.food-fab.show { display: flex; }
+
+/* FOOD BOTTOM SHEET */
+.food-sheet-bg {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 1000;
+  align-items: flex-end; justify-content: center;
+}
+.food-sheet-bg.show { display: flex; animation: fadeIn 0.2s ease; }
+.food-sheet {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0; padding: 24px 20px 36px;
+  width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;
+}
+.food-photo-zone {
+  width: 100%; min-height: 140px;
+  background: var(--card2); border: 2px dashed var(--border);
+  border-radius: 14px; display: flex;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+  cursor: pointer; margin-bottom: 16px;
+  overflow: hidden; position: relative;
+}
+.food-photo-zone:hover { border-color: var(--red); }
+.food-photo-zone .ico { font-size: 32px; color: var(--muted); }
+.food-photo-zone .label { font-size: 13px; color: var(--muted); }
+.food-photo-preview {
+  width: 100%; max-height: 200px; object-fit: cover;
+  border-radius: 12px; display: none;
+}
+.food-photo-zone.has-photo { border-style: solid; border-color: var(--border); }
+.food-photo-zone.has-photo .ico,
+.food-photo-zone.has-photo .label { display: none; }
+.food-photo-zone.has-photo .food-photo-preview { display: block; }
+
+/* FOOD ANALYSIS RESULT */
+.food-analysis { display: none; margin-bottom: 16px; }
+.food-analysis.show { display: block; animation: fadeIn 0.3s ease; }
+.food-verdict-banner {
+  padding: 14px 16px; border-radius: 14px; margin-bottom: 12px;
+  font-size: 14px; font-weight: 600;
+}
+.food-verdict-banner.paleo { background: rgba(46,204,113,0.15); border: 1px solid var(--green); color: var(--green); }
+.food-verdict-banner.warn { background: rgba(243,156,18,0.15); border: 1px solid #f39c12; color: #f39c12; }
+.food-verdict-banner.bad { background: rgba(233,69,96,0.15); border: 1px solid var(--red); color: var(--red); }
+.food-desc { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.food-flags { margin-bottom: 14px; }
+.food-flag {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--muted);
+}
+.food-flag:last-child { border-bottom: none; }
+.food-flag-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.food-flag-dot.ok { background: var(--green); }
+.food-flag-dot.warn { background: #f39c12; }
+.food-flag-dot.bad { background: var(--red); }
+.food-flag-name { font-weight: 600; color: var(--text); }
+.food-spinner {
+  display: none; text-align: center; padding: 24px;
+  color: var(--muted); font-size: 14px;
+}
+.food-spinner.show { display: block; }
+.food-spinner .dots::after {
+  content: ''; animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+.food-actions {
+  display: flex; gap: 10px;
+}
+.food-actions button {
+  flex: 1; padding: 14px; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-weight: 700;
+  font-size: 15px; cursor: pointer; border: none;
+}
+.food-log-btn { background: var(--red); color: white; }
+.food-log-btn:hover { opacity: 0.85; }
+.food-discard-btn { background: var(--card2); color: var(--muted); border: 1px solid var(--border) !important; }
+.food-discard-btn:hover { border-color: var(--red) !important; color: var(--red); }
 </style>
 </head>
 <body>
@@ -608,6 +745,7 @@ body {
     <button class="tab" onclick="switchDay('c')"><span class="big">C</span>Front Sq</button>
     <button class="tab" onclick="switchDay('d')"><span class="big">D</span>HIIT</button>
     <button class="tab" onclick="switchDay('diary')"><span class="big">📓</span>Diary</button>
+    <button class="tab" onclick="switchDay('food')"><span class="big">🍎</span>Food</button>
     <button class="tab" onclick="switchDay('h')"><span class="big">📅</span>History</button>
   </div>
 </div>
@@ -1360,6 +1498,44 @@ body {
   </div>
 </div>
 
+<!-- FOOD PANEL -->
+<div class="panel" id="panel-food">
+  <div class="food-score" id="food-score">
+    <div class="food-score-num" id="food-score-num">—</div>
+    <div class="food-score-verdict" id="food-score-verdict">Log a meal to start tracking</div>
+  </div>
+  <div id="food-entries-container"></div>
+</div>
+
+<!-- FOOD FAB -->
+<button class="food-fab" id="food-fab" onclick="openFoodSheet()">+</button>
+
+<!-- FOOD BOTTOM SHEET -->
+<div class="food-sheet-bg" id="food-sheet-bg" onclick="if(event.target===this)closeFoodSheet()">
+  <div class="food-sheet">
+    <div class="diary-modal-date" style="margin-bottom:16px;">Log a meal</div>
+    <div class="food-photo-zone" id="food-photo-zone" onclick="document.getElementById('food-file-input').click()">
+      <span class="ico">📸</span>
+      <span class="label">Tap to take or upload a photo</span>
+      <img class="food-photo-preview" id="food-photo-preview">
+    </div>
+    <input type="file" id="food-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleFoodPhoto(this)">
+    <div class="food-spinner" id="food-spinner">
+      🔍 Checking ingredients<span class="dots"></span>
+    </div>
+    <div class="food-analysis" id="food-analysis">
+      <div class="food-verdict-banner" id="food-verdict-banner"></div>
+      <div class="food-desc" id="food-desc"></div>
+      <div class="food-flags" id="food-flags"></div>
+      <textarea class="diary-notes" id="food-notes" placeholder="Add a note (optional)..." rows="2"></textarea>
+      <div class="food-actions">
+        <button class="food-discard-btn" onclick="closeFoodSheet()">Discard</button>
+        <button class="food-log-btn" onclick="saveFoodEntry()">Log it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORY PANEL -->
 <div class="panel" id="panel-h">
   <div class="streak-card" id="streak-card">
@@ -1649,14 +1825,17 @@ function toggleCard(day, idx) {
 function switchDay(day) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   const tabs = document.querySelectorAll('.tab');
-  const idx = ['a','b','c','d','diary','h'].indexOf(day);
+  const idx = ['a','b','c','d','diary','food','h'].indexOf(day);
   if (tabs[idx]) tabs[idx].classList.add('active');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + day).classList.add('active');
   document.querySelectorAll('.ex-card.open').forEach(c => c.classList.remove('open'));
+  // Show/hide food FAB
+  document.getElementById('food-fab').classList.toggle('show', day === 'food');
   window.scrollTo(0, 0);
   if (day === 'h') loadHistory();
   if (day === 'diary') renderDiary();
+  if (day === 'food') loadFoodEntries();
 }
 
 // ---- DIARY ----
@@ -1810,7 +1989,7 @@ async function deleteDiaryEntry(id) {
 async function loadHistory() {
   const el = document.getElementById('history-list');
   try {
-    const rows = await apiGet('/api/history');
+    const rows = await apiGet('/api/history-all');
     if (!rows.length) {
       el.innerHTML = '<div class="history-empty"><span class="ico">🏋️</span>No workouts yet. Get after it!</div>';
       document.getElementById('stat-total').textContent = '0';
@@ -1840,9 +2019,22 @@ async function loadHistory() {
     // List
     const dayNames = { a: 'Squat Day', b: 'Deadlift Day', c: 'Front Squat Day', d: 'HIIT Day' };
     el.innerHTML = rows.map(r => {
-      const pct = Math.round((r.exercises_done / r.total_exercises) * 100);
       const date = new Date(r.logged_at);
       const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+      if (r.source === 'diary') {
+        const notesSnippet = r.notes ? ` · ${r.notes}` : '';
+        return `
+        <div class="history-entry">
+          <div class="history-day-badge" style="background:var(--accent2,#6c63ff)">${r.day.toUpperCase()}</div>
+          <div class="history-info">
+            <div class="history-date">${dayNames[r.day] || 'Day ' + r.day.toUpperCase()} <span style="font-size:.75em;opacity:.6">(diary)</span></div>
+            <div class="history-meta">${dateStr}${notesSnippet}</div>
+          </div>
+        </div>`;
+      }
+
+      const pct = Math.round((r.exercises_done / r.total_exercises) * 100);
       const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       return `
         <div class="history-entry">
@@ -1856,6 +2048,216 @@ async function loadHistory() {
     }).join('');
   } catch(e) {
     el.innerHTML = '<div class="history-empty"><span class="ico">⚠️</span>Could not load history.</div>';
+  }
+}
+
+// ---- FOOD ----
+let foodAnalysis = null;
+let foodImageBase64 = null;
+let foodImageMime = null;
+
+function todayStr() {
+  const t = new Date();
+  return t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
+}
+
+async function loadFoodEntries() {
+  const container = document.getElementById('food-entries-container');
+  try {
+    const entries = await apiGet('/api/food?date=' + todayStr());
+    if (!entries.length) {
+      container.innerHTML = '<div class="food-empty"><span class="ico">🍽️</span>No meals logged today.<br>Tap + to snap a photo.</div>';
+      document.getElementById('food-score-num').textContent = '—';
+      document.getElementById('food-score-num').className = 'food-score-num';
+      document.getElementById('food-score-verdict').textContent = 'Log a meal to start tracking';
+      return;
+    }
+
+    // Score
+    const paleoCount = entries.filter(e => e.is_paleo).length;
+    const total = entries.length;
+    const scoreEl = document.getElementById('food-score-num');
+    scoreEl.textContent = paleoCount + ' / ' + total;
+    const verdictEl = document.getElementById('food-score-verdict');
+    if (paleoCount === total) {
+      scoreEl.className = 'food-score-num clean';
+      verdictEl.textContent = 'Clean day 💪';
+    } else if (paleoCount >= total / 2) {
+      scoreEl.className = 'food-score-num mixed';
+      verdictEl.textContent = 'Mostly clean — keep it up';
+    } else {
+      scoreEl.className = 'food-score-num off';
+      verdictEl.textContent = 'Off track — reset tomorrow';
+    }
+
+    // Group by meal_time
+    const mealOrder = ['breakfast', 'lunch', 'snack', 'dinner'];
+    const grouped = {};
+    entries.forEach(e => {
+      const mt = e.meal_time || 'other';
+      if (!grouped[mt]) grouped[mt] = [];
+      grouped[mt].push(e);
+    });
+
+    let html = '';
+    for (const mt of mealOrder) {
+      if (!grouped[mt]) continue;
+      html += '<div class="food-meal-group">';
+      html += '<div class="food-meal-label">' + mt.charAt(0).toUpperCase() + mt.slice(1) + '</div>';
+      for (const e of grouped[mt]) {
+        const icon = e.is_paleo ? '✅' : (e.flags?.some(f => f.status === 'bad') ? '❌' : '⚠️');
+        html += `<div class="food-entry">
+          <span class="food-entry-icon">${icon}</span>
+          <div class="food-entry-info">
+            <div class="food-entry-name">${e.description || 'Meal'}</div>
+            <div class="food-entry-verdict">${e.verdict || ''}</div>
+          </div>
+          <button class="food-entry-del" onclick="deleteFoodEntry(${e.id})">✕</button>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    // Any ungrouped
+    if (grouped['other']) {
+      html += '<div class="food-meal-group"><div class="food-meal-label">Other</div>';
+      for (const e of grouped['other']) {
+        const icon = e.is_paleo ? '✅' : '❌';
+        html += `<div class="food-entry">
+          <span class="food-entry-icon">${icon}</span>
+          <div class="food-entry-info">
+            <div class="food-entry-name">${e.description || 'Meal'}</div>
+            <div class="food-entry-verdict">${e.verdict || ''}</div>
+          </div>
+          <button class="food-entry-del" onclick="deleteFoodEntry(${e.id})">✕</button>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = '<div class="food-empty"><span class="ico">🍽️</span>No meals logged today.</div>';
+  }
+}
+
+function openFoodSheet() {
+  foodAnalysis = null;
+  foodImageBase64 = null;
+  foodImageMime = null;
+  document.getElementById('food-photo-zone').classList.remove('has-photo');
+  document.getElementById('food-photo-preview').style.display = 'none';
+  document.getElementById('food-spinner').classList.remove('show');
+  document.getElementById('food-analysis').classList.remove('show');
+  document.getElementById('food-notes').value = '';
+  document.getElementById('food-file-input').value = '';
+  document.getElementById('food-sheet-bg').classList.add('show');
+}
+
+function closeFoodSheet() {
+  document.getElementById('food-sheet-bg').classList.remove('show');
+}
+
+async function handleFoodPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    // Show preview
+    const preview = document.getElementById('food-photo-preview');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    document.getElementById('food-photo-zone').classList.add('has-photo');
+
+    // Extract base64
+    const base64 = dataUrl.split(',')[1];
+    foodImageBase64 = base64;
+    foodImageMime = file.type || 'image/jpeg';
+
+    // Show spinner, hide analysis
+    document.getElementById('food-spinner').classList.add('show');
+    document.getElementById('food-analysis').classList.remove('show');
+
+    try {
+      const result = await apiPost('/api/food/analyze', {
+        image_base64: base64,
+        mime_type: foodImageMime,
+      });
+      foodAnalysis = result;
+      showFoodAnalysis(result);
+    } catch (err) {
+      document.getElementById('food-spinner').classList.remove('show');
+      alert('Analysis failed: ' + err.message);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function showFoodAnalysis(result) {
+  document.getElementById('food-spinner').classList.remove('show');
+
+  const banner = document.getElementById('food-verdict-banner');
+  if (result.is_paleo) {
+    banner.className = 'food-verdict-banner paleo';
+    banner.textContent = '✅ ' + result.verdict;
+  } else if (result.flags?.every(f => f.status !== 'bad')) {
+    banner.className = 'food-verdict-banner warn';
+    banner.textContent = '⚠️ ' + result.verdict;
+  } else {
+    banner.className = 'food-verdict-banner bad';
+    banner.textContent = '❌ ' + result.verdict;
+  }
+
+  document.getElementById('food-desc').textContent = result.description || 'Unknown meal';
+
+  const flagsEl = document.getElementById('food-flags');
+  if (result.flags && result.flags.length) {
+    flagsEl.innerHTML = result.flags.map(f => `
+      <div class="food-flag">
+        <div class="food-flag-dot ${f.status}"></div>
+        <span class="food-flag-name">${f.ingredient}</span>
+        <span>${f.reason}</span>
+      </div>
+    `).join('');
+  } else {
+    flagsEl.innerHTML = '';
+  }
+
+  document.getElementById('food-analysis').classList.add('show');
+}
+
+async function saveFoodEntry() {
+  if (!foodAnalysis) return;
+  setSyncStatus('saving');
+  try {
+    await apiPost('/api/food', {
+      date: todayStr(),
+      meal_time: foodAnalysis.meal_time || null,
+      description: foodAnalysis.description || null,
+      is_paleo: foodAnalysis.is_paleo,
+      verdict: foodAnalysis.verdict || null,
+      flags: foodAnalysis.flags || [],
+      notes: document.getElementById('food-notes').value.trim(),
+      image_data: foodImageBase64 ? ('data:' + foodImageMime + ';base64,' + foodImageBase64) : null,
+    });
+    setSyncStatus('saved');
+    closeFoodSheet();
+    loadFoodEntries();
+  } catch (e) {
+    console.warn('Food save failed:', e);
+    setSyncStatus('');
+  }
+}
+
+async function deleteFoodEntry(id) {
+  setSyncStatus('saving');
+  try {
+    await apiDelete('/api/food/' + id);
+    setSyncStatus('saved');
+    loadFoodEntries();
+  } catch (e) {
+    console.warn('Food delete failed:', e);
+    setSyncStatus('');
   }
 }
 

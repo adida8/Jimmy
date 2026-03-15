@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Railway sets DATABASE_URL automatically when you add a Postgres plugin
@@ -37,6 +37,19 @@ async function initDB() {
       notes TEXT DEFAULT '',
       created_at TIMESTAMPTZ DEFAULT NOW(),
       UNIQUE(entry_date, workout_type)
+    );
+
+    CREATE TABLE IF NOT EXISTS food_log (
+      id SERIAL PRIMARY KEY,
+      logged_at TIMESTAMPTZ DEFAULT NOW(),
+      date DATE NOT NULL,
+      meal_time TEXT,
+      description TEXT,
+      is_paleo BOOLEAN,
+      verdict TEXT,
+      flags JSONB,
+      notes TEXT,
+      image_data TEXT
     );
   `);
   console.log('DB ready');
@@ -92,6 +105,21 @@ app.get('/api/history',async (req, res) => {
   res.json(rows);
 });
 
+// GET /api/history-all — merged workout_log + diary, sorted by date desc
+app.get('/api/history-all',async (req, res) => {
+  const { rows } = await pool.query(`
+    SELECT id, day, exercises_done, total_exercises, logged_at, 'log' AS source, NULL AS notes
+    FROM workout_log
+    UNION ALL
+    SELECT id, workout_type AS day, NULL AS exercises_done, NULL AS total_exercises,
+           entry_date::timestamptz AS logged_at, 'diary' AS source, notes
+    FROM diary
+    ORDER BY logged_at DESC
+    LIMIT 30
+  `);
+  res.json(rows);
+});
+
 // GET /api/diary?month=YYYY-MM — get diary entries for a month
 app.get('/api/diary',async (req, res) => {
   const month = req.query.month; // e.g. "2026-03"
@@ -129,6 +157,122 @@ app.delete('/api/diary/:id',async (req, res) => {
 app.delete('/api/progress/day/:day',async (req, res) => {
   const day = req.params.day;
   await pool.query("UPDATE progress SET sets_done = 0, is_done = FALSE WHERE key LIKE $1", [`${day}-%`]);
+  res.json({ ok: true });
+});
+
+// ---- FOOD PHOTO LOGGING ----
+
+// POST /api/food/analyze — send image to Claude Vision for paleo analysis
+app.post('/api/food/analyze', async (req, res) => {
+  const { image_base64, mime_type } = req.body;
+  if (!image_base64 || !mime_type) return res.status(400).json({ error: 'image_base64 and mime_type required' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
+
+  const prompt = `You are a strict paleo diet analyzer. Analyze this food photo and return ONLY a JSON object, no markdown, no explanation.
+
+{
+  "description": "brief name of the food/meal",
+  "is_paleo": true/false,
+  "verdict": "one sentence verdict, plain language",
+  "meal_time": "breakfast" | "lunch" | "dinner" | "snack",
+  "flags": [
+    {
+      "ingredient": "name",
+      "status": "ok" | "warn" | "bad",
+      "reason": "one short sentence"
+    }
+  ]
+}
+
+Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed oils, no artificial additives. Flag anything borderline as warn. If you cannot identify the food clearly, set is_paleo to false and explain in verdict.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5-20250624',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mime_type,
+                data: image_base64,
+              },
+            },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Claude API error:', response.status, errBody);
+      return res.status(502).json({ error: 'Claude API error: ' + response.status });
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse JSON from response (strip any accidental markdown fences)
+    const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const analysis = JSON.parse(jsonStr);
+    res.json(analysis);
+  } catch (e) {
+    console.error('Food analyze error:', e);
+    res.status(500).json({ error: 'Analysis failed: ' + e.message });
+  }
+});
+
+// POST /api/food — save a food entry
+app.post('/api/food', async (req, res) => {
+  const { date, meal_time, description, is_paleo, verdict, flags, notes, image_data } = req.body;
+  if (!date) return res.status(400).json({ error: 'date required' });
+  try {
+    const { rows } = await pool.query(`
+      INSERT INTO food_log (date, meal_time, description, is_paleo, verdict, flags, notes, image_data)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes
+    `, [date, meal_time || null, description || null, is_paleo, verdict || null, JSON.stringify(flags || []), notes || '', image_data || null]);
+    res.json(rows[0]);
+  } catch (e) {
+    console.error('Food save error:', e);
+    res.status(500).json({ error: 'Save failed: ' + e.message });
+  }
+});
+
+// GET /api/food?date=YYYY-MM-DD — get food entries for a date
+app.get('/api/food', async (req, res) => {
+  const date = req.query.date;
+  if (!date) return res.status(400).json({ error: 'date query param required (YYYY-MM-DD)' });
+  try {
+    const { rows } = await pool.query(`
+      SELECT id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes
+      FROM food_log
+      WHERE date = $1
+      ORDER BY logged_at ASC
+    `, [date]);
+    res.json(rows);
+  } catch (e) {
+    console.error('Food fetch error:', e);
+    res.json([]);
+  }
+});
+
+// DELETE /api/food/:id — remove a food entry
+app.delete('/api/food/:id', async (req, res) => {
+  await pool.query('DELETE FROM food_log WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
