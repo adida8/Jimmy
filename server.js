@@ -197,7 +197,7 @@ Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5-20250624',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         messages: [{
           role: 'user',
