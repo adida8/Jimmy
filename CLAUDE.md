@@ -63,7 +63,6 @@ git push origin main          # push to GitHub (adida8/Jimmy)
 - `ANTHROPIC_API_KEY` — required for food photo analysis (Claude Vision)
 
 ## Known Issues / TODO
-- **Food analysis returns 502** — the `/api/food/analyze` endpoint calls Claude API but gets an error. Debug next session: check `ANTHROPIC_API_KEY` is set in Railway (`railway vars`), check model name is valid, check Railway logs for the specific error message.
 - Body size limit set to 10mb (`express.json({ limit: '10mb' })`) for base64 image uploads
 
 ## Notes
@@ -71,4 +70,7 @@ git push origin main          # push to GitHub (adida8/Jimmy)
 - Frontend is a single HTML file with inlined CSS/JS
 - Mobile-responsive: calendar, workout views, food sheet all work on mobile
 - Food sheet has two buttons: "📸 Camera" (uses `capture="environment"`) and "🖼️ Gallery" (plain file picker)
+- **Image resize:** Photos are resized client-side (max 1200px, JPEG quality 0.7) before upload to stay under Claude's 5MB base64 limit
+- Food feed uses Instagram-style card layout (full-width photo, header with avatar/time, verdict, ingredient flags, notes)
+- `relativeTime()` helper shows "just now", "Xm ago", "Xh ago", or date for older entries
 - Title displays as "JIMMY"
