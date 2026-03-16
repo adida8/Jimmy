@@ -2189,8 +2189,9 @@ async function loadFoodEntries() {
     for (const e of entries) {
       const icon = e.is_paleo ? '✅' : (e.flags?.some(f => f.status === 'bad') ? '❌' : '⚠️');
       const timeStr = relativeTime(e.logged_at);
+      const imgSrc = e.image_data?.startsWith('data:') ? e.image_data : `data:image/jpeg;base64,${e.image_data}`;
       const imgHtml = e.image_data
-        ? `<img class="food-card-img" src="data:image/jpeg;base64,${e.image_data}" alt="${e.description || 'Meal'}">`
+        ? `<img class="food-card-img" src="${imgSrc}" alt="${e.description || 'Meal'}">`
         : `<div class="food-card-img-placeholder">🍽️</div>`;
       let flagsHtml = '';
       if (e.flags && e.flags.length) {
