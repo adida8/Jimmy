@@ -52,9 +52,25 @@ async function initDB() {
       image_data TEXT
     );
 
-    -- Add user_override column if not exists
+    -- Add columns if not exists
     DO $$ BEGIN
       ALTER TABLE food_log ADD COLUMN user_override BOOLEAN DEFAULT FALSE;
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$;
+    DO $$ BEGIN
+      ALTER TABLE food_log ADD COLUMN health_score INTEGER;
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$;
+    DO $$ BEGIN
+      ALTER TABLE food_log ADD COLUMN health_reason TEXT;
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$;
+    DO $$ BEGIN
+      ALTER TABLE food_log ADD COLUMN culinary_score INTEGER;
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$;
+    DO $$ BEGIN
+      ALTER TABLE food_log ADD COLUMN culinary_reason TEXT;
     EXCEPTION WHEN duplicate_column THEN NULL;
     END $$;
   `);
@@ -176,13 +192,17 @@ app.post('/api/food/analyze', async (req, res) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
 
-  const prompt = `You are a strict paleo diet analyzer. Analyze this food photo and return ONLY a JSON object, no markdown, no explanation.
+  const prompt = `You are a strict paleo diet analyzer and food critic. Analyze this food photo and return ONLY a JSON object, no markdown, no explanation.
 
 {
   "description": "brief name of the food/meal",
   "is_paleo": true/false,
   "verdict": "one sentence verdict, plain language",
   "meal_time": "breakfast" | "lunch" | "dinner" | "snack",
+  "health_score": 1-10,
+  "health_reason": "one sentence explaining the health score",
+  "culinary_score": 1-10,
+  "culinary_reason": "one sentence explaining the culinary score",
   "flags": [
     {
       "ingredient": "name",
@@ -191,6 +211,9 @@ app.post('/api/food/analyze', async (req, res) => {
     }
   ]
 }
+
+health_score: 1=very unhealthy, 10=extremely nutritious. Consider nutrient density, balance, whole foods, processing level.
+culinary_score: 1=poorly made/presented, 10=restaurant quality. Consider presentation, cooking technique, flavor combinations, creativity.
 
 Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed oils, no artificial additives. Flag anything borderline as warn. If you cannot identify the food clearly, set is_paleo to false and explain in verdict.`;
 
@@ -243,14 +266,14 @@ Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed
 
 // POST /api/food — save a food entry
 app.post('/api/food', async (req, res) => {
-  const { date, meal_time, description, is_paleo, verdict, flags, notes, image_data } = req.body;
+  const { date, meal_time, description, is_paleo, verdict, flags, notes, image_data, health_score, health_reason, culinary_score, culinary_reason } = req.body;
   if (!date) return res.status(400).json({ error: 'date required' });
   try {
     const { rows } = await pool.query(`
-      INSERT INTO food_log (date, meal_time, description, is_paleo, verdict, flags, notes, image_data)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes
-    `, [date, meal_time || null, description || null, is_paleo, verdict || null, JSON.stringify(flags || []), notes || '', image_data || null]);
+      INSERT INTO food_log (date, meal_time, description, is_paleo, verdict, flags, notes, image_data, health_score, health_reason, culinary_score, culinary_reason)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes, health_score, health_reason, culinary_score, culinary_reason
+    `, [date, meal_time || null, description || null, is_paleo, verdict || null, JSON.stringify(flags || []), notes || '', image_data || null, health_score || null, health_reason || null, culinary_score || null, culinary_reason || null]);
     res.json(rows[0]);
   } catch (e) {
     console.error('Food save error:', e);
@@ -264,7 +287,7 @@ app.get('/api/food', async (req, res) => {
   if (!date) return res.status(400).json({ error: 'date query param required (YYYY-MM-DD)' });
   try {
     const { rows } = await pool.query(`
-      SELECT id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes, image_data, user_override
+      SELECT id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes, image_data, user_override, health_score, health_reason, culinary_score, culinary_reason
       FROM food_log
       WHERE date = $1
       ORDER BY logged_at ASC

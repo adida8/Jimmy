@@ -693,6 +693,41 @@ body {
 .food-card-overridden {
   padding: 6px 16px 0; font-size: 11px; color: var(--muted); font-style: italic;
 }
+/* Scores */
+.food-card-scores {
+  display: flex; gap: 10px; margin-bottom: 10px;
+}
+.food-score-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px; font-size: 12px;
+}
+.food-score-pill .score-label { color: var(--muted); }
+.food-score-pill .score-val { font-weight: 700; }
+.food-score-pill .score-val.high { color: #2ecc71; }
+.food-score-pill .score-val.mid { color: #f39c12; }
+.food-score-pill .score-val.low { color: #e74c3c; }
+.food-score-pill .score-reason { color: var(--muted); font-size: 11px; }
+/* Comment section */
+.food-card-comment {
+  padding: 10px 16px; border-top: 0.5px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px;
+}
+.food-card-comment input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-size: 13px; font-family: inherit;
+}
+.food-card-comment input::placeholder { color: var(--muted); opacity: 0.6; }
+.food-card-comment button {
+  background: none; border: none; color: var(--red); font-weight: 700;
+  font-size: 13px; cursor: pointer; font-family: inherit; padding: 4px 8px;
+  opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+.food-card-comment button.visible { opacity: 1; pointer-events: auto; }
+/* Date/time line */
+.food-card-datetime {
+  font-size: 12px; color: var(--muted); padding: 0 0 2px;
+}
 .food-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
 .food-empty .ico { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
 #food-entries-container { margin: 0 -16px; }
@@ -2189,6 +2224,14 @@ async function loadFoodEntries() {
     for (const e of entries) {
       const icon = e.is_paleo ? '✅' : (e.flags?.some(f => f.status === 'bad') ? '❌' : '⚠️');
       const timeStr = relativeTime(e.logged_at);
+      const d = new Date(e.logged_at);
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const h = d.getHours(); const m = d.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      const dateTimeStr = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()} · ${h12}:${m.toString().padStart(2,'0')} ${ampm}`;
+
       const imgSrc = e.image_data?.startsWith('data:') ? e.image_data : `data:image/jpeg;base64,${e.image_data}`;
       const imgHtml = e.image_data
         ? `<img class="food-card-img" src="${imgSrc}" alt="${e.description || 'Meal'}">`
@@ -2204,14 +2247,38 @@ async function loadFoodEntries() {
       }
       const noteHtml = e.notes ? `<div class="food-card-note">💬 "${e.notes}"</div>` : '';
 
+      // Scores
+      const scoreClass = (v) => v >= 7 ? 'high' : v >= 4 ? 'mid' : 'low';
+      let scoresHtml = '';
+      if (e.health_score || e.culinary_score) {
+        scoresHtml = '<div class="food-card-scores">';
+        if (e.health_score) {
+          scoresHtml += `<div class="food-score-pill" title="${e.health_reason || ''}">
+            <span class="score-label">🏥 Health</span>
+            <span class="score-val ${scoreClass(e.health_score)}">${e.health_score}/10</span>
+          </div>`;
+        }
+        if (e.culinary_score) {
+          scoresHtml += `<div class="food-score-pill" title="${e.culinary_reason || ''}">
+            <span class="score-label">👨‍🍳 Culinary</span>
+            <span class="score-val ${scoreClass(e.culinary_score)}">${e.culinary_score}/10</span>
+          </div>`;
+        }
+        scoresHtml += '</div>';
+      }
+
       const overriddenHtml = e.user_override ? `<div class="food-card-overridden">✏️ You overrode the AI verdict</div>` : '';
       const confirmActive = e.is_paleo ? ' active' : '';
       const declineActive = (!e.is_paleo && e.user_override) ? ' active' : '';
+      const escapedNote = (e.notes || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
       html += `<div class="food-card" id="food-card-${e.id}">
         <div class="food-card-header">
           <div class="food-card-avatar">JM</div>
-          <div class="food-card-meta"><strong>Jimmy</strong> · <span class="time">${timeStr}</span></div>
+          <div class="food-card-meta">
+            <strong>Jimmy</strong> · <span class="time">${timeStr}</span>
+            <div class="food-card-datetime">${dateTimeStr}</div>
+          </div>
           <div class="food-card-actions">
             <button class="food-card-btn del" onclick="confirmDeleteFood(${e.id})" title="Delete">🗑️</button>
           </div>
@@ -2223,6 +2290,7 @@ async function loadFoodEntries() {
             <span class="food-card-desc">${e.description || 'Meal'}</span>
           </div>
           <div class="food-card-verdict-text">${e.verdict || ''}</div>
+          ${scoresHtml}
           ${flagsHtml}
           ${noteHtml}
         </div>
@@ -2231,6 +2299,10 @@ async function loadFoodEntries() {
           <span>Agree with AI?</span>
           <button class="food-override-btn confirm${confirmActive}" onclick="overrideFoodVerdict(${e.id}, true)">✅ Paleo</button>
           <button class="food-override-btn decline${declineActive}" onclick="overrideFoodVerdict(${e.id}, false)">❌ Not paleo</button>
+        </div>
+        <div class="food-card-comment">
+          <input type="text" placeholder="Add a comment..." value="${escapedNote}" oninput="this.nextElementSibling.classList.toggle('visible', this.value !== '${escapedNote}')" id="comment-input-${e.id}">
+          <button onclick="saveComment(${e.id})">Post</button>
         </div>
       </div>`;
     }
@@ -2361,6 +2433,10 @@ async function saveFoodEntry() {
       flags: foodAnalysis.flags || [],
       notes: document.getElementById('food-notes').value.trim(),
       image_data: foodImageBase64 ? ('data:' + foodImageMime + ';base64,' + foodImageBase64) : null,
+      health_score: foodAnalysis.health_score || null,
+      health_reason: foodAnalysis.health_reason || null,
+      culinary_score: foodAnalysis.culinary_score || null,
+      culinary_reason: foodAnalysis.culinary_reason || null,
     });
     setSyncStatus('saved');
     closeFoodSheet();
@@ -2383,6 +2459,24 @@ async function deleteFoodEntry(id) {
     loadFoodEntries();
   } catch (e) {
     console.warn('Food delete failed:', e);
+    setSyncStatus('');
+  }
+}
+
+async function saveComment(id) {
+  const input = document.getElementById('comment-input-' + id);
+  if (!input) return;
+  setSyncStatus('saving');
+  try {
+    await fetch(API_URL + '/api/food/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: input.value.trim() })
+    });
+    setSyncStatus('saved');
+    loadFoodEntries();
+  } catch (e) {
+    console.warn('Comment save failed:', e);
     setSyncStatus('');
   }
 }
