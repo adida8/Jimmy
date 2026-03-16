@@ -610,9 +610,9 @@ body {
 }
 /* INSTAGRAM-STYLE FOOD CARD */
 .food-card {
-  background: #1a1a1a;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  background: var(--card);
   margin: 0 -16px;
+  border-bottom: 8px solid var(--dark);
 }
 .food-card-header {
   display: flex; align-items: center; gap: 10px;
@@ -627,13 +627,18 @@ body {
 .food-card-meta { flex: 1; font-size: 13px; color: var(--text); }
 .food-card-meta strong { font-weight: 600; }
 .food-card-meta .time { color: var(--muted); }
-.food-card-del {
-  background: none; border: none; color: var(--muted); font-size: 18px;
-  cursor: pointer; padding: 4px 8px; opacity: 0.5; transition: opacity .2s;
+.food-card-actions {
+  display: flex; align-items: center; gap: 2px;
 }
-.food-card-del:hover { opacity: 1; color: var(--red); }
+.food-card-btn {
+  background: none; border: none; color: var(--muted); font-size: 16px;
+  cursor: pointer; padding: 6px 8px; opacity: 0.6; transition: all .2s;
+  border-radius: 8px;
+}
+.food-card-btn:hover { opacity: 1; background: rgba(255,255,255,0.06); }
+.food-card-btn.del:hover { color: var(--red); }
 .food-card-img {
-  width: 100%; height: 280px; object-fit: cover; display: block;
+  width: 100%; height: 320px; object-fit: cover; display: block;
   background: #111;
 }
 .food-card-img-placeholder {
@@ -661,7 +666,32 @@ body {
 .food-card-flag .reason { color: var(--muted); }
 .food-card-note {
   font-size: 13px; color: var(--muted); font-style: italic;
-  padding-top: 6px; border-top: 0.5px solid rgba(255,255,255,0.06);
+  padding-top: 8px; border-top: 0.5px solid rgba(255,255,255,0.06);
+}
+/* Verdict override bar */
+.food-card-override {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-top: 0.5px solid rgba(255,255,255,0.06);
+  font-size: 12px; color: var(--muted);
+}
+.food-card-override span { flex: 1; }
+.food-override-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+  background: transparent; color: var(--text); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s; font-family: inherit;
+}
+.food-override-btn:hover { background: rgba(255,255,255,0.06); }
+.food-override-btn.confirm { border-color: #2ecc71; color: #2ecc71; }
+.food-override-btn.confirm:hover { background: rgba(46,204,113,0.15); }
+.food-override-btn.decline { border-color: var(--red); color: var(--red); }
+.food-override-btn.decline:hover { background: rgba(233,69,96,0.15); }
+.food-override-btn.active {
+  color: white; font-weight: 700;
+}
+.food-override-btn.confirm.active { background: #2ecc71; border-color: #2ecc71; }
+.food-override-btn.decline.active { background: var(--red); border-color: var(--red); }
+.food-card-overridden {
+  padding: 6px 16px 0; font-size: 11px; color: var(--muted); font-style: italic;
 }
 .food-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
 .food-empty .ico { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
@@ -2173,11 +2203,17 @@ async function loadFoodEntries() {
       }
       const noteHtml = e.notes ? `<div class="food-card-note">💬 "${e.notes}"</div>` : '';
 
-      html += `<div class="food-card">
+      const overriddenHtml = e.user_override ? `<div class="food-card-overridden">✏️ You overrode the AI verdict</div>` : '';
+      const confirmActive = e.is_paleo ? ' active' : '';
+      const declineActive = (!e.is_paleo && e.user_override) ? ' active' : '';
+
+      html += `<div class="food-card" id="food-card-${e.id}">
         <div class="food-card-header">
           <div class="food-card-avatar">JM</div>
           <div class="food-card-meta"><strong>Jimmy</strong> · <span class="time">${timeStr}</span></div>
-          <button class="food-card-del" onclick="deleteFoodEntry(${e.id})">···</button>
+          <div class="food-card-actions">
+            <button class="food-card-btn del" onclick="confirmDeleteFood(${e.id})" title="Delete">🗑️</button>
+          </div>
         </div>
         ${imgHtml}
         <div class="food-card-body">
@@ -2188,6 +2224,12 @@ async function loadFoodEntries() {
           <div class="food-card-verdict-text">${e.verdict || ''}</div>
           ${flagsHtml}
           ${noteHtml}
+        </div>
+        ${overriddenHtml}
+        <div class="food-card-override">
+          <span>Agree with AI?</span>
+          <button class="food-override-btn confirm${confirmActive}" onclick="overrideFoodVerdict(${e.id}, true)">✅ Paleo</button>
+          <button class="food-override-btn decline${declineActive}" onclick="overrideFoodVerdict(${e.id}, false)">❌ Not paleo</button>
         </div>
       </div>`;
     }
@@ -2328,6 +2370,10 @@ async function saveFoodEntry() {
   }
 }
 
+function confirmDeleteFood(id) {
+  if (confirm('Delete this meal entry?')) deleteFoodEntry(id);
+}
+
 async function deleteFoodEntry(id) {
   setSyncStatus('saving');
   try {
@@ -2336,6 +2382,23 @@ async function deleteFoodEntry(id) {
     loadFoodEntries();
   } catch (e) {
     console.warn('Food delete failed:', e);
+    setSyncStatus('');
+  }
+}
+
+async function overrideFoodVerdict(id, isPaleo) {
+  setSyncStatus('saving');
+  try {
+    const verdict = isPaleo ? 'Marked paleo by user' : 'Marked not paleo by user';
+    await fetch(API_URL + '/api/food/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_paleo: isPaleo, verdict })
+    });
+    setSyncStatus('saved');
+    loadFoodEntries();
+  } catch (e) {
+    console.warn('Override failed:', e);
     setSyncStatus('');
   }
 }

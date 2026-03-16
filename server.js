@@ -51,6 +51,12 @@ async function initDB() {
       notes TEXT,
       image_data TEXT
     );
+
+    -- Add user_override column if not exists
+    DO $$ BEGIN
+      ALTER TABLE food_log ADD COLUMN user_override BOOLEAN DEFAULT FALSE;
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$;
   `);
   console.log('DB ready');
 }
@@ -258,7 +264,7 @@ app.get('/api/food', async (req, res) => {
   if (!date) return res.status(400).json({ error: 'date query param required (YYYY-MM-DD)' });
   try {
     const { rows } = await pool.query(`
-      SELECT id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes
+      SELECT id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date, meal_time, description, is_paleo, verdict, flags, notes, image_data, user_override
       FROM food_log
       WHERE date = $1
       ORDER BY logged_at ASC
@@ -267,6 +273,29 @@ app.get('/api/food', async (req, res) => {
   } catch (e) {
     console.error('Food fetch error:', e);
     res.json([]);
+  }
+});
+
+// PATCH /api/food/:id — update a food entry (verdict override, notes, etc.)
+app.patch('/api/food/:id', async (req, res) => {
+  const { is_paleo, verdict, notes } = req.body;
+  const sets = [];
+  const vals = [];
+  let i = 1;
+  if (is_paleo !== undefined) { sets.push(`is_paleo = $${i++}`); vals.push(is_paleo); sets.push(`user_override = $${i++}`); vals.push(true); }
+  if (verdict !== undefined) { sets.push(`verdict = $${i++}`); vals.push(verdict); }
+  if (notes !== undefined) { sets.push(`notes = $${i++}`); vals.push(notes); }
+  if (!sets.length) return res.status(400).json({ error: 'Nothing to update' });
+  vals.push(req.params.id);
+  try {
+    const { rows } = await pool.query(
+      `UPDATE food_log SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`,
+      vals
+    );
+    res.json(rows[0]);
+  } catch (e) {
+    console.error('Food update error:', e);
+    res.status(500).json({ error: 'Update failed' });
   }
 });
 
