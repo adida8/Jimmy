@@ -2215,23 +2215,43 @@ function closeFoodSheet() {
   document.getElementById('food-sheet-bg').classList.remove('show');
 }
 
+function resizeImage(dataUrl, maxDim, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
 async function handleFoodPhoto(input) {
   const file = input.files[0];
   if (!file) return;
 
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const dataUrl = e.target.result;
+    // Resize to max 1200px, JPEG quality 0.7 to stay under 5MB
+    const resized = await resizeImage(e.target.result, 1200, 0.7);
+
     // Show preview
     const preview = document.getElementById('food-photo-preview');
-    preview.src = dataUrl;
+    preview.src = resized;
     document.getElementById('food-photo-btns').style.display = 'none';
     document.getElementById('food-photo-preview-wrap').classList.add('show');
 
     // Extract base64
-    const base64 = dataUrl.split(',')[1];
+    const base64 = resized.split(',')[1];
     foodImageBase64 = base64;
-    foodImageMime = file.type || 'image/jpeg';
+    foodImageMime = 'image/jpeg';
 
     // Show spinner, hide analysis
     document.getElementById('food-spinner').classList.add('show');
