@@ -73,6 +73,27 @@ async function initDB() {
       ALTER TABLE food_log ADD COLUMN culinary_reason TEXT;
     EXCEPTION WHEN duplicate_column THEN NULL;
     END $$;
+
+    -- Exercise notes
+    CREATE TABLE IF NOT EXISTS exercise_notes (
+      key VARCHAR(20) PRIMARY KEY,
+      note TEXT DEFAULT '',
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    -- Custom programs
+    CREATE TABLE IF NOT EXISTS programs (
+      id SERIAL PRIMARY KEY,
+      day CHAR(1) NOT NULL,
+      position INTEGER NOT NULL,
+      section TEXT NOT NULL,
+      name TEXT NOT NULL,
+      sets INTEGER DEFAULT 3,
+      reps TEXT DEFAULT '10',
+      rest TEXT DEFAULT '60s',
+      cues TEXT DEFAULT '',
+      icon TEXT DEFAULT '💪'
+    );
   `);
   console.log('DB ready');
 }
@@ -326,6 +347,179 @@ app.patch('/api/food/:id', async (req, res) => {
 app.delete('/api/food/:id', async (req, res) => {
   await pool.query('DELETE FROM food_log WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
+});
+
+// GET /api/exercise-notes — load all exercise notes
+app.get('/api/exercise-notes', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT key, note FROM exercise_notes');
+    const notes = {};
+    for (const r of rows) notes[r.key] = r.note;
+    res.json(notes);
+  } catch (e) { res.json({}); }
+});
+
+// POST /api/exercise-notes — save a note for an exercise
+app.post('/api/exercise-notes', async (req, res) => {
+  const { key, note } = req.body;
+  if (!key) return res.status(400).json({ error: 'key required' });
+  try {
+    await pool.query(`
+      INSERT INTO exercise_notes (key, note, updated_at) VALUES ($1, $2, NOW())
+      ON CONFLICT (key) DO UPDATE SET note = $2, updated_at = NOW()
+    `, [key, note || '']);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/achievements — compute badges from data
+app.get('/api/achievements', async (req, res) => {
+  try {
+    const badges = [];
+
+    // Total workouts
+    const { rows: [wc] } = await pool.query('SELECT COUNT(*) as c FROM workout_log');
+    const totalWorkouts = parseInt(wc.c);
+    if (totalWorkouts >= 1) badges.push({ id: 'first-workout', name: 'First Blood', desc: 'Complete your first workout', icon: '🎯', earned: true });
+    else badges.push({ id: 'first-workout', name: 'First Blood', desc: 'Complete your first workout', icon: '🎯', earned: false });
+
+    if (totalWorkouts >= 10) badges.push({ id: '10-workouts', name: 'Double Digits', desc: 'Complete 10 workouts', icon: '💪', earned: true });
+    else badges.push({ id: '10-workouts', name: 'Double Digits', desc: 'Complete 10 workouts', icon: '💪', earned: false, progress: totalWorkouts, target: 10 });
+
+    if (totalWorkouts >= 50) badges.push({ id: '50-workouts', name: 'Half Century', desc: 'Complete 50 workouts', icon: '🏆', earned: true });
+    else badges.push({ id: '50-workouts', name: 'Half Century', desc: 'Complete 50 workouts', icon: '🏆', earned: false, progress: totalWorkouts, target: 50 });
+
+    if (totalWorkouts >= 100) badges.push({ id: '100-workouts', name: 'Centurion', desc: 'Complete 100 workouts', icon: '👑', earned: true });
+    else badges.push({ id: '100-workouts', name: 'Centurion', desc: 'Complete 100 workouts', icon: '👑', earned: false, progress: totalWorkouts, target: 100 });
+
+    // Streak calculation
+    const { rows: streakRows } = await pool.query(`
+      SELECT DISTINCT logged_at::date as d FROM workout_log
+      UNION SELECT DISTINCT entry_date as d FROM diary
+      ORDER BY d DESC
+    `);
+    const daySet = new Set(streakRows.map(r => r.d.toISOString().substring(0, 10)));
+    let streak = 0;
+    const d = new Date();
+    // Check today first, if not there check yesterday as start
+    const todayCheck = d.toISOString().substring(0, 10);
+    if (!daySet.has(todayCheck)) {
+      d.setDate(d.getDate() - 1);
+    }
+    while (daySet.has(d.toISOString().substring(0, 10))) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+
+    if (streak >= 3) badges.push({ id: '3-streak', name: 'Hat Trick', desc: '3-day workout streak', icon: '🔥', earned: true });
+    else badges.push({ id: '3-streak', name: 'Hat Trick', desc: '3-day workout streak', icon: '🔥', earned: false, progress: streak, target: 3 });
+
+    if (streak >= 7) badges.push({ id: '7-streak', name: 'Week Warrior', desc: '7-day workout streak', icon: '⚡', earned: true });
+    else badges.push({ id: '7-streak', name: 'Week Warrior', desc: '7-day workout streak', icon: '⚡', earned: false, progress: streak, target: 7 });
+
+    if (streak >= 30) badges.push({ id: '30-streak', name: 'Iron Month', desc: '30-day workout streak', icon: '🦾', earned: true });
+    else badges.push({ id: '30-streak', name: 'Iron Month', desc: '30-day workout streak', icon: '🦾', earned: false, progress: streak, target: 30 });
+
+    // Paleo streak
+    const { rows: foodRows } = await pool.query('SELECT is_paleo FROM food_log ORDER BY logged_at DESC');
+    let paleoStreak = 0;
+    for (const f of foodRows) {
+      if (f.is_paleo) paleoStreak++;
+      else break;
+    }
+
+    if (paleoStreak >= 5) badges.push({ id: '5-paleo', name: 'Clean Eater', desc: '5 paleo meals in a row', icon: '🥩', earned: true });
+    else badges.push({ id: '5-paleo', name: 'Clean Eater', desc: '5 paleo meals in a row', icon: '🥩', earned: false, progress: paleoStreak, target: 5 });
+
+    if (paleoStreak >= 10) badges.push({ id: '10-paleo', name: 'Paleo Pro', desc: '10 paleo meals in a row', icon: '🥇', earned: true });
+    else badges.push({ id: '10-paleo', name: 'Paleo Pro', desc: '10 paleo meals in a row', icon: '🥇', earned: false, progress: paleoStreak, target: 10 });
+
+    if (paleoStreak >= 25) badges.push({ id: '25-paleo', name: 'Caveman', desc: '25 paleo meals in a row', icon: '🦴', earned: true });
+    else badges.push({ id: '25-paleo', name: 'Caveman', desc: '25 paleo meals in a row', icon: '🦴', earned: false, progress: paleoStreak, target: 25 });
+
+    // All 4 program types completed at least once
+    const { rows: dayTypes } = await pool.query('SELECT DISTINCT day FROM workout_log');
+    const typesCompleted = new Set(dayTypes.map(r => r.day.toLowerCase()));
+    const allFour = ['a','b','c','d'].every(d => typesCompleted.has(d));
+    if (allFour) badges.push({ id: 'all-programs', name: 'Well Rounded', desc: 'Complete all 4 programs', icon: '🎪', earned: true });
+    else badges.push({ id: 'all-programs', name: 'Well Rounded', desc: 'Complete all 4 programs', icon: '🎪', earned: false, progress: typesCompleted.size, target: 4 });
+
+    res.json({ badges, stats: { totalWorkouts, streak, paleoStreak } });
+  } catch (e) {
+    console.error('Achievements error:', e);
+    res.json({ badges: [], stats: {} });
+  }
+});
+
+// GET /api/programs/:day — get exercises for a day
+app.get('/api/programs/:day', async (req, res) => {
+  const day = req.params.day.toLowerCase();
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM programs WHERE day = $1 ORDER BY position ASC',
+      [day]
+    );
+    res.json(rows);
+  } catch (e) { res.json([]); }
+});
+
+// PUT /api/programs/:day — replace all exercises for a day
+app.put('/api/programs/:day', async (req, res) => {
+  const day = req.params.day.toLowerCase();
+  const { exercises } = req.body;
+  if (!exercises || !Array.isArray(exercises)) return res.status(400).json({ error: 'exercises array required' });
+  try {
+    await pool.query('DELETE FROM programs WHERE day = $1', [day]);
+    for (let i = 0; i < exercises.length; i++) {
+      const ex = exercises[i];
+      await pool.query(
+        'INSERT INTO programs (day, position, section, name, sets, reps, rest, cues, icon) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+        [day, i, ex.section || '', ex.name, ex.sets || 3, ex.reps || '10', ex.rest || '60s', ex.cues || '', ex.icon || '💪']
+      );
+    }
+    const { rows } = await pool.query('SELECT * FROM programs WHERE day = $1 ORDER BY position ASC', [day]);
+    res.json(rows);
+  } catch (e) {
+    console.error('Programs save error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// POST /api/programs/:day/reset — reset to defaults
+app.post('/api/programs/:day/reset', async (req, res) => {
+  const day = req.params.day.toLowerCase();
+  try {
+    await pool.query('DELETE FROM programs WHERE day = $1', [day]);
+    res.json({ ok: true, message: 'Cleared. Client will use defaults.' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/feed?days=N — merged feed of food + workouts, grouped by date
+app.get('/api/feed', async (req, res) => {
+  const days = parseInt(req.query.days) || 14;
+  try {
+    const { rows } = await pool.query(`
+      SELECT 'food' AS type, id, logged_at, TO_CHAR(date, 'YYYY-MM-DD') as date,
+             meal_time, description, is_paleo, verdict, flags, notes, image_data,
+             user_override, health_score, health_reason, culinary_score, culinary_reason
+      FROM food_log
+      WHERE date >= CURRENT_DATE - $1::integer
+      UNION ALL
+      SELECT 'workout' AS type, wl.id, wl.logged_at, TO_CHAR(wl.logged_at::date, 'YYYY-MM-DD') as date,
+             NULL as meal_time, wl.day AS description, NULL::boolean as is_paleo,
+             wl.exercises_done || '/' || wl.total_exercises || ' exercises' AS verdict,
+             NULL::jsonb as flags, NULL as notes, NULL as image_data,
+             NULL::boolean as user_override, NULL::integer as health_score, NULL as health_reason,
+             NULL::integer as culinary_score, NULL as culinary_reason
+      FROM workout_log wl
+      WHERE wl.logged_at >= CURRENT_DATE - $1::integer
+      ORDER BY date DESC, logged_at DESC
+    `, [days]);
+    res.json(rows);
+  } catch (e) {
+    console.error('Feed error:', e);
+    res.json([]);
+  }
 });
 
 const PORT = process.env.PORT || 3000;
