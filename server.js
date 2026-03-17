@@ -203,6 +203,74 @@ app.delete('/api/progress/day/:day',async (req, res) => {
   res.json({ ok: true });
 });
 
+// ---- AI WORKOUT GENERATOR ----
+
+app.post('/api/workout/generate', async (req, res) => {
+  const { prompt: userPrompt } = req.body;
+  if (!userPrompt) return res.status(400).json({ error: 'prompt required' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
+
+  const systemPrompt = `You are an expert personal trainer. The user will describe the kind of workout they want. Generate a workout plan and return ONLY a JSON object, no markdown, no explanation.
+
+{
+  "title": "short workout title (2-4 words)",
+  "exercises": [
+    {
+      "section": "section label with emoji, e.g. '🔥 Warm-Up' or '💪 Main Work' or '🎯 Finisher'",
+      "name": "exercise name",
+      "sets": 3,
+      "reps": "rep range or duration, e.g. '8-10' or '30s' or '30s on / 30s off'",
+      "rest": "rest period, e.g. '60s' or '90s' or 'Minimal'",
+      "cues": "1-2 key form tips",
+      "icon": "single emoji for the exercise"
+    }
+  ]
+}
+
+Guidelines:
+- Generate 5-10 exercises depending on the request
+- Group exercises into 2-3 sections (warm-up, main work, finisher/cooldown)
+- Include appropriate sets, reps, and rest periods
+- If the user asks for a short/quick workout, keep it to 5-6 exercises
+- If they mention a time limit, respect it (estimate ~3 min per exercise including rest)
+- Always include form cues for safety
+- Use varied, creative exercises — not just the basics
+- Match the intensity and style to what the user asks for`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: systemPrompt + '\n\nUser request: ' + userPrompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Claude API error:', response.status, errBody);
+      return res.status(502).json({ error: 'Claude API error: ' + response.status });
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const workout = JSON.parse(jsonStr);
+    res.json(workout);
+  } catch (e) {
+    console.error('Workout generate error:', e);
+    res.status(500).json({ error: 'Generation failed: ' + e.message });
+  }
+});
+
 // ---- FOOD PHOTO LOGGING ----
 
 // POST /api/food/analyze — send image to Claude Vision for paleo analysis

@@ -835,6 +835,125 @@ body {
 .workout-day-tab .big { font-family: 'Bebas Neue', sans-serif; font-size: 20px; display: block; line-height: 1.1; }
 .workout-day-tab.active { background: var(--red); border-color: var(--red); color: white; }
 
+/* AI WORKOUT GENERATOR */
+.ai-workout-gen {
+  background: linear-gradient(135deg, rgba(229,57,53,0.1), rgba(156,39,176,0.1));
+  border: 1.5px solid rgba(229,57,53,0.3);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.ai-workout-gen .ai-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-workout-gen .ai-label span { font-size: 16px; }
+.ai-workout-gen .ai-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ai-workout-gen .ai-input-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+.ai-workout-gen .ai-input-row input::placeholder { color: var(--muted); }
+.ai-workout-gen .ai-input-row input:focus { border-color: var(--red); }
+.ai-workout-gen .ai-input-row button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: var(--red);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ai-workout-gen .ai-input-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ai-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ai-chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ai-chip:active { background: var(--red); color: white; border-color: var(--red); }
+
+/* AI generated workout panel */
+.ai-gen-result {
+  display: none;
+  margin-bottom: 16px;
+}
+.ai-gen-result.show { display: block; }
+.ai-gen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ai-gen-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: white;
+}
+.ai-gen-actions { display: flex; gap: 8px; }
+.ai-gen-actions button {
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ai-gen-actions button.primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+.ai-gen-spinner {
+  display: none;
+  text-align: center;
+  padding: 40px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.ai-gen-spinner.show { display: block; }
+.ai-gen-spinner .spinner-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+@keyframes dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
 /* WORKOUT PANEL */
 .workout-panel { display: none; }
 .workout-panel.active { display: block; animation: fadeIn 0.3s ease; }
@@ -1173,6 +1292,38 @@ body {
 
 <!-- WORKOUT PANEL -->
 <div class="panel" id="panel-workout">
+  <!-- AI Workout Generator -->
+  <div class="ai-workout-gen">
+    <div class="ai-label"><span>🤖</span> What kind of workout today?</div>
+    <div class="ai-input-row">
+      <input type="text" id="ai-workout-input" placeholder="e.g. Quick upper body, leg day no squats..." onkeydown="if(event.key==='Enter')generateWorkout()">
+      <button id="ai-workout-btn" onclick="generateWorkout()">Go</button>
+    </div>
+    <div class="ai-chips">
+      <div class="ai-chip" onclick="aiChip('Upper body push & pull')">💪 Upper</div>
+      <div class="ai-chip" onclick="aiChip('Heavy leg day')">🦵 Legs</div>
+      <div class="ai-chip" onclick="aiChip('Core & abs blast')">🎯 Core</div>
+      <div class="ai-chip" onclick="aiChip('Full body strength')">🏋️ Full Body</div>
+      <div class="ai-chip" onclick="aiChip('Quick 20 min HIIT')">⚡ Quick HIIT</div>
+      <div class="ai-chip" onclick="aiChip('Stretch & recovery')">🧘 Recovery</div>
+    </div>
+  </div>
+
+  <!-- AI generated workout result -->
+  <div class="ai-gen-spinner" id="ai-gen-spinner">
+    <span style="font-size:32px">🤖</span><br>Generating your workout<span class="spinner-dots"></span>
+  </div>
+  <div class="ai-gen-result" id="ai-gen-result">
+    <div class="ai-gen-header">
+      <div class="ai-gen-title" id="ai-gen-title"></div>
+      <div class="ai-gen-actions">
+        <button onclick="dismissAiWorkout()">Dismiss</button>
+        <button class="primary" onclick="startAiWorkout()">Start</button>
+      </div>
+    </div>
+    <div id="ai-gen-exercises"></div>
+  </div>
+
   <div class="workout-day-tabs">
     <button class="workout-day-tab active" onclick="switchWorkoutDay('a')"><span class="big">A</span>Squat</button>
     <button class="workout-day-tab" onclick="switchWorkoutDay('b')"><span class="big">B</span>Deadlift</button>
@@ -3038,6 +3189,234 @@ function switchWorkoutDay(day) {
   const panel = document.getElementById('panel-' + day);
   if (panel) panel.classList.add('active');
   document.querySelectorAll('.ex-card.open').forEach(c => c.classList.remove('open'));
+}
+
+// ---- AI WORKOUT GENERATOR ----
+let aiGeneratedWorkout = null;
+let aiWorkoutActive = false;
+const aiDone = new Set();
+const aiSetsDone = {};
+let aiSetsSize = {};
+
+function aiChip(text) {
+  document.getElementById('ai-workout-input').value = text;
+  generateWorkout();
+}
+
+async function generateWorkout() {
+  const input = document.getElementById('ai-workout-input');
+  const prompt = input.value.trim();
+  if (!prompt) return;
+
+  const btn = document.getElementById('ai-workout-btn');
+  btn.disabled = true;
+  document.getElementById('ai-gen-spinner').classList.add('show');
+  document.getElementById('ai-gen-result').classList.remove('show');
+
+  try {
+    const result = await apiPost('/api/workout/generate', { prompt });
+    aiGeneratedWorkout = result;
+    showAiWorkout(result);
+  } catch (e) {
+    alert('Failed to generate workout: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    document.getElementById('ai-gen-spinner').classList.remove('show');
+  }
+}
+
+function showAiWorkout(workout) {
+  document.getElementById('ai-gen-title').textContent = workout.title || 'Custom Workout';
+  const container = document.getElementById('ai-gen-exercises');
+
+  let html = '';
+  let currentSection = '';
+  (workout.exercises || []).forEach((ex, i) => {
+    if (ex.section && ex.section !== currentSection) {
+      currentSection = ex.section;
+      html += `<div class="section-label">${currentSection}</div>`;
+    }
+    html += `
+      <div class="ex-card">
+        <div class="ex-card-header">
+          <div class="ex-left">
+            <div class="ex-name">${ex.icon || '💪'} ${ex.name}</div>
+            <div class="ex-meta">
+              <span>Sets: <strong>${ex.sets}</strong></span>
+              <span>Reps: <strong>${ex.reps}</strong></span>
+              <span>Rest: <strong>${ex.rest}</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="ex-body" style="display:block;padding:8px 16px 12px">
+          <div class="cue-box"><strong>Tips</strong> ${ex.cues || ''}</div>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('ai-gen-result').classList.add('show');
+}
+
+function dismissAiWorkout() {
+  aiGeneratedWorkout = null;
+  document.getElementById('ai-gen-result').classList.remove('show');
+  document.getElementById('ai-workout-input').value = '';
+}
+
+function startAiWorkout() {
+  if (!aiGeneratedWorkout) return;
+  // Hide the preview, show as a real trackable workout
+  document.getElementById('ai-gen-result').classList.remove('show');
+  aiWorkoutActive = true;
+  aiDone.clear();
+  Object.keys(aiSetsDone).forEach(k => delete aiSetsDone[k]);
+  aiSetsSize = {};
+
+  // Hide the day tabs and show the AI workout panel
+  document.querySelector('.workout-day-tabs').style.display = 'none';
+  document.querySelectorAll('.workout-panel').forEach(p => p.classList.remove('active'));
+
+  // Build a workout panel for the AI workout
+  let existing = document.getElementById('panel-ai');
+  if (existing) existing.remove();
+
+  const panel = document.createElement('div');
+  panel.className = 'workout-panel active';
+  panel.id = 'panel-ai';
+
+  const exercises = aiGeneratedWorkout.exercises || [];
+  let html = `
+    <div class="hero">
+      <div class="hero-day">🤖</div>
+      <div class="hero-title">${aiGeneratedWorkout.title || 'AI Workout'}</div>
+      <div class="hero-sub">${exercises.length} exercises</div>
+    </div>
+    <button class="edit-program-btn" onclick="endAiWorkout()" style="background:transparent;border:1.5px solid var(--border);color:var(--muted)">✕ End Workout</button>
+    <div id="progress-ai" class="progress-bar-wrap">
+      <div class="progress-label"><span>Progress</span><strong id="progress-ai-text">0 / ${exercises.length}</strong></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-ai-bar" style="width:0%"></div></div>
+    </div>
+    <div id="complete-ai" class="complete-banner">🎉 Workout Complete!</div>`;
+
+  let currentSection = '';
+  exercises.forEach((ex, i) => {
+    if (ex.section && ex.section !== currentSection) {
+      currentSection = ex.section;
+      html += `<div class="section-label">${currentSection}</div>`;
+    }
+    const key = 'ai-' + i;
+    aiSetsSize[key] = ex.sets || 3;
+    aiSetsDone[key] = 0;
+    html += `
+      <div id="ex-${key}" class="ex-card" onclick="toggleAiCard(${i})">
+        <div class="ex-card-header">
+          <div class="ex-left">
+            <div class="ex-name">${ex.icon || '💪'} ${ex.name}</div>
+            <div class="ex-meta">
+              <span>Sets: <strong>${ex.sets}</strong></span>
+              <span>Reps: <strong>${ex.reps}</strong></span>
+              <span>Rest: <strong>${ex.rest}</strong></span>
+            </div>
+          </div>
+          <div class="ex-right">
+            <button class="check-btn" onclick="markAiDone(event,${i})">✓</button>
+            <span class="chevron">▼</span>
+          </div>
+        </div>
+        <div class="ex-body">
+          <div class="cue-box"><strong>Key Cues</strong> ${ex.cues || ''}</div>
+          <div class="set-tracker"><div id="sets-${key}"></div></div>
+        </div>
+      </div>`;
+  });
+
+  panel.innerHTML = html;
+
+  // Insert after the day tabs container
+  const dayTabs = document.querySelector('.workout-day-tabs');
+  dayTabs.parentNode.insertBefore(panel, dayTabs.nextSibling);
+
+  // Build set dots
+  exercises.forEach((ex, i) => {
+    buildAiSetDots(i);
+  });
+}
+
+function toggleAiCard(idx) {
+  const card = document.getElementById('ex-ai-' + idx);
+  if (card) card.classList.toggle('open');
+}
+
+function buildAiSetDots(idx) {
+  const key = 'ai-' + idx;
+  const container = document.getElementById('sets-' + key);
+  if (!container) return;
+  const n = aiSetsSize[key] || 3;
+  if (aiSetsDone[key] === undefined) aiSetsDone[key] = 0;
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'set-dot' + (i < aiSetsDone[key] ? ' done' : '');
+    btn.textContent = i + 1;
+    btn.onclick = (e) => { e.stopPropagation(); toggleAiSet(idx, i, n); };
+    container.appendChild(btn);
+  }
+}
+
+function toggleAiSet(idx, setIdx, total) {
+  const key = 'ai-' + idx;
+  const current = aiSetsDone[key] || 0;
+  aiSetsDone[key] = setIdx < current ? setIdx : setIdx + 1;
+  buildAiSetDots(idx);
+  const isDone = aiSetsDone[key] >= total;
+  if (isDone) {
+    aiDone.add(idx);
+    document.getElementById('ex-' + key).classList.add('done');
+  } else {
+    aiDone.delete(idx);
+    document.getElementById('ex-' + key).classList.remove('done');
+  }
+  updateAiProgress();
+}
+
+function markAiDone(e, idx) {
+  e.stopPropagation();
+  const key = 'ai-' + idx;
+  const card = document.getElementById('ex-' + key);
+  if (aiDone.has(idx)) {
+    aiDone.delete(idx);
+    card.classList.remove('done');
+    aiSetsDone[key] = 0;
+  } else {
+    aiDone.add(idx);
+    card.classList.add('done');
+    aiSetsDone[key] = aiSetsSize[key] || 3;
+  }
+  buildAiSetDots(idx);
+  updateAiProgress();
+}
+
+function updateAiProgress() {
+  const total = aiGeneratedWorkout.exercises.length;
+  const completed = aiDone.size;
+  const pct = Math.round((completed / total) * 100);
+  document.getElementById('progress-ai-text').textContent = completed + ' / ' + total;
+  document.getElementById('progress-ai-bar').style.width = pct + '%';
+  if (completed === total) {
+    document.getElementById('complete-ai').classList.add('show');
+  } else {
+    document.getElementById('complete-ai').classList.remove('show');
+  }
+}
+
+function endAiWorkout() {
+  aiWorkoutActive = false;
+  aiGeneratedWorkout = null;
+  const panel = document.getElementById('panel-ai');
+  if (panel) panel.remove();
+  document.querySelector('.workout-day-tabs').style.display = 'flex';
+  switchWorkoutDay(currentWorkoutDay);
 }
 
 // ---- FEED ----
