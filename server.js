@@ -236,7 +236,7 @@ app.post('/api/food/analyze', async (req, res) => {
 health_score: 1=very unhealthy, 10=extremely nutritious. Consider nutrient density, balance, whole foods, processing level.
 culinary_score: 1=poorly made/presented, 10=restaurant quality. Consider presentation, cooking technique, flavor combinations, creativity.
 
-Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed oils, no artificial additives. Flag anything borderline as warn. If you cannot identify the food clearly, set is_paleo to false and explain in verdict.`;
+Paleo rules: no grains, no legumes, no dairy (strict) EXCEPT yogurt/yoghurt which is allowed, no refined sugar, no seed oils, no artificial additives. Flag anything borderline as warn. If you cannot identify the food clearly, set is_paleo to false and explain in verdict.`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
