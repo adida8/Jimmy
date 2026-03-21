@@ -1032,6 +1032,246 @@ body {
 }
 .edit-program-btn:hover { border-color: var(--red); color: var(--red); }
 
+/* RECOMMEND MODAL */
+.recommend-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.recommend-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+.recommend-modal {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 28px 22px 24px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+.recommend-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px;
+}
+.recommend-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: var(--red);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.recommend-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.recommend-q {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.recommend-mood-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.recommend-mood-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--card2);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.recommend-mood-btn.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+.recommend-slider-wrap {
+  margin-bottom: 18px;
+}
+.recommend-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.recommend-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+}
+.recommend-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--red);
+  cursor: pointer;
+}
+.recommend-slider-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--red);
+  min-width: 28px;
+  text-align: center;
+}
+.recommend-pref-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.recommend-pref-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--card2);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.recommend-pref-btn.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+.recommend-go-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--red);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.recommend-go-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.recommend-loading {
+  display: none;
+  text-align: center;
+  padding: 30px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.recommend-loading.show { display: block; }
+.recommend-loading .ld-emoji {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 12px;
+  animation: pulse 1.5s ease infinite;
+}
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+/* RECOMMEND RESULT CARD */
+.recommend-result {
+  display: none;
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease;
+}
+.recommend-result.show { display: block; }
+.recommend-result-card {
+  background: linear-gradient(135deg, rgba(229,57,53,0.12), rgba(156,39,176,0.08));
+  border: 1.5px solid rgba(229,57,53,0.35);
+  border-radius: 18px;
+  padding: 20px;
+}
+.recommend-result-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.recommend-result-icon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  background: rgba(229,57,53,0.15);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recommend-result-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.recommend-result-program {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: white;
+  line-height: 1.1;
+}
+.recommend-result-reason {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.recommend-result-mod {
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.recommend-result-actions {
+  display: flex;
+  gap: 10px;
+}
+.recommend-start-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--red);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.recommend-dismiss-btn {
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .edit-modal-bg {
   display: none;
   position: fixed;
@@ -1292,6 +1532,24 @@ body {
 
 <!-- WORKOUT PANEL -->
 <div class="panel" id="panel-workout">
+  <!-- AI Recommendation Card -->
+  <div class="recommend-result" id="recommend-result">
+    <div class="recommend-result-card">
+      <div class="recommend-result-header">
+        <div class="recommend-result-icon" id="recommend-result-icon">🏋️</div>
+        <div>
+          <div class="recommend-result-label">AI Recommends</div>
+          <div class="recommend-result-program" id="recommend-result-program">Day A — Squat Day</div>
+        </div>
+      </div>
+      <div class="recommend-result-reason" id="recommend-result-reason"></div>
+      <div class="recommend-result-mod" id="recommend-result-mod"></div>
+      <div class="recommend-result-actions">
+        <button class="recommend-start-btn" id="recommend-start-btn" onclick="startRecommended()">Start Workout</button>
+        <button class="recommend-dismiss-btn" onclick="hideRecommendCard()">Dismiss</button>
+      </div>
+    </div>
+  </div>
   <!-- AI Workout Generator -->
   <div class="ai-workout-gen">
     <div class="ai-label"><span>🤖</span> What kind of workout today?</div>
@@ -2222,6 +2480,50 @@ body {
     <div class="food-score-verdict" id="food-score-verdict">Log a meal to start tracking</div>
   </div>
   <div id="food-entries-container"></div>
+</div>
+
+<!-- RECOMMEND MODAL -->
+<div class="recommend-overlay" id="recommend-overlay" onclick="if(event.target===this)dismissRecommend()">
+  <div class="recommend-modal">
+    <button class="recommend-close" onclick="dismissRecommend()">&times;</button>
+    <div class="recommend-title">WHAT'S THE VIBE?</div>
+    <div class="recommend-sub">Answer 3 quick questions — I'll pick your workout.</div>
+
+    <div id="recommend-form">
+      <div class="recommend-q">Mood</div>
+      <div class="recommend-mood-btns">
+        <button class="recommend-mood-btn" onclick="pickMood(this,'aggressive')">🔥 Aggressive</button>
+        <button class="recommend-mood-btn" onclick="pickMood(this,'neutral')">😐 Neutral</button>
+        <button class="recommend-mood-btn" onclick="pickMood(this,'chill')">😌 Chill</button>
+      </div>
+
+      <div class="recommend-q">Energy Level</div>
+      <div class="recommend-slider-wrap">
+        <div class="recommend-slider-row">
+          <span style="font-size:12px;color:var(--muted)">😴</span>
+          <input type="range" min="1" max="10" value="5" class="recommend-slider" id="recommend-energy" oninput="document.getElementById('recommend-energy-val').textContent=this.value">
+          <span style="font-size:12px;color:var(--muted)">⚡</span>
+          <div class="recommend-slider-val" id="recommend-energy-val">5</div>
+        </div>
+      </div>
+
+      <div class="recommend-q">Preference</div>
+      <div class="recommend-pref-btns">
+        <button class="recommend-pref-btn" onclick="pickPref(this,'weights')">🏋️ Weights</button>
+        <button class="recommend-pref-btn" onclick="pickPref(this,'bodyweight')">🤸 Bodyweight</button>
+        <button class="recommend-pref-btn" onclick="pickPref(this,'cardio')">🏃 Cardio</button>
+        <button class="recommend-pref-btn" onclick="pickPref(this,'mixed')">🔀 Mixed</button>
+        <button class="recommend-pref-btn" onclick="pickPref(this,'surprise me')">🎲 Surprise Me</button>
+      </div>
+
+      <button class="recommend-go-btn" id="recommend-go-btn" onclick="getRecommendation()" disabled>Get My Workout</button>
+    </div>
+
+    <div class="recommend-loading" id="recommend-loading">
+      <span class="ld-emoji">🧠</span>
+      Analyzing your history...
+    </div>
+  </div>
 </div>
 
 <!-- FOOD FAB -->
@@ -3804,11 +4106,119 @@ async function loadCustomPrograms() {
   }
 }
 
+// ---- AI RECOMMENDATION ----
+let recMood = null;
+let recPref = null;
+let recResult = null;
+
+function pickMood(btn, mood) {
+  recMood = mood;
+  document.querySelectorAll('.recommend-mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateRecBtn();
+}
+
+function pickPref(btn, pref) {
+  recPref = pref;
+  document.querySelectorAll('.recommend-pref-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateRecBtn();
+}
+
+function updateRecBtn() {
+  document.getElementById('recommend-go-btn').disabled = !(recMood && recPref);
+}
+
+function showRecommendModal() {
+  recMood = null;
+  recPref = null;
+  recResult = null;
+  document.querySelectorAll('.recommend-mood-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.recommend-pref-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('recommend-energy').value = 5;
+  document.getElementById('recommend-energy-val').textContent = '5';
+  document.getElementById('recommend-go-btn').disabled = true;
+  document.getElementById('recommend-form').style.display = 'block';
+  document.getElementById('recommend-loading').classList.remove('show');
+  document.getElementById('recommend-overlay').classList.add('show');
+}
+
+function dismissRecommend() {
+  document.getElementById('recommend-overlay').classList.remove('show');
+  // Mark as shown today
+  localStorage.setItem('jimmy-rec-date', todayStr());
+}
+
+async function getRecommendation() {
+  const energy = parseInt(document.getElementById('recommend-energy').value);
+  document.getElementById('recommend-form').style.display = 'none';
+  document.getElementById('recommend-loading').classList.add('show');
+
+  try {
+    const resp = await fetch(API_URL + '/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mood: recMood, energy, preferences: recPref })
+    });
+    const data = await resp.json();
+    recResult = data;
+
+    // Close modal
+    document.getElementById('recommend-overlay').classList.remove('show');
+    localStorage.setItem('jimmy-rec-date', todayStr());
+
+    // Show result card on workout tab
+    const programNames = { A: 'Squat Day', B: 'Deadlift Day', C: 'Front Squat Day', D: 'HIIT Day' };
+    const programIcons = { A: '🏋️', B: '💀', C: '🦵', D: '⚡' };
+    const prog = (data.program || 'A').toUpperCase();
+
+    document.getElementById('recommend-result-icon').textContent = programIcons[prog] || '🏋️';
+    document.getElementById('recommend-result-program').textContent = 'Day ' + prog + ' — ' + (programNames[prog] || prog);
+    document.getElementById('recommend-result-reason').textContent = data.reason || '';
+    const modEl = document.getElementById('recommend-result-mod');
+    if (data.modification) {
+      modEl.textContent = '💡 ' + data.modification;
+      modEl.style.display = 'block';
+    } else {
+      modEl.style.display = 'none';
+    }
+    document.getElementById('recommend-result').classList.add('show');
+
+    // Switch to workout tab
+    switchTab('workout');
+  } catch (e) {
+    console.error('Recommendation failed:', e);
+    document.getElementById('recommend-overlay').classList.remove('show');
+    localStorage.setItem('jimmy-rec-date', todayStr());
+  }
+}
+
+function startRecommended() {
+  if (!recResult) return;
+  const day = (recResult.program || 'a').toLowerCase();
+  hideRecommendCard();
+  switchTab('workout');
+  switchWorkoutDay(day);
+}
+
+function hideRecommendCard() {
+  document.getElementById('recommend-result').classList.remove('show');
+}
+
+function checkShowRecommend() {
+  const lastShown = localStorage.getItem('jimmy-rec-date');
+  if (lastShown !== todayStr()) {
+    // Delay slightly so page loads first
+    setTimeout(() => showRecommendModal(), 800);
+  }
+}
+
 // ---- INIT ----
 loadProgress();
 loadFeed();
 loadExerciseNotes();
 loadCustomPrograms();
+checkShowRecommend();
 document.getElementById('food-fab').classList.add('show');
 </script>
 </body>

@@ -203,6 +203,105 @@ app.delete('/api/progress/day/:day',async (req, res) => {
   res.json({ ok: true });
 });
 
+// ---- AI WORKOUT RECOMMENDATION ----
+
+app.post('/api/recommend', async (req, res) => {
+  const { mood, energy, preferences } = req.body;
+  if (!mood || energy === undefined || !preferences) {
+    return res.status(400).json({ error: 'mood, energy, and preferences required' });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
+
+  try {
+    // Fetch last 14 days of diary entries
+    const { rows: recentDiary } = await pool.query(`
+      SELECT workout_type, entry_date,
+             CURRENT_DATE - entry_date AS days_ago
+      FROM diary
+      WHERE entry_date >= CURRENT_DATE - 14
+      ORDER BY entry_date DESC
+    `);
+
+    // Fetch last 14 days of workout logs
+    const { rows: recentLogs } = await pool.query(`
+      SELECT day, exercises_done, total_exercises, logged_at,
+             CURRENT_DATE - logged_at::date AS days_ago
+      FROM workout_log
+      WHERE logged_at >= CURRENT_DATE - 14
+      ORDER BY logged_at DESC
+    `);
+
+    // Fetch incomplete exercises for today
+    const { rows: pendingProgress } = await pool.query(`
+      SELECT key, sets_done, is_done FROM progress WHERE is_done = FALSE AND sets_done > 0
+    `);
+
+    // Build history context
+    const historyLines = [];
+    for (const d of recentDiary) {
+      const label = { a: 'Squat Day', b: 'Deadlift Day', c: 'Front Squat Day', d: 'HIIT Day' }[d.workout_type.toLowerCase()] || d.workout_type;
+      historyLines.push(`${label} (${d.days_ago}d ago)`);
+    }
+    for (const l of recentLogs) {
+      const label = { a: 'Squat Day', b: 'Deadlift Day', c: 'Front Squat Day', d: 'HIIT Day' }[l.day.toLowerCase()] || l.day;
+      if (!historyLines.some(h => h.includes(label) && h.includes(`${l.days_ago}d ago`))) {
+        historyLines.push(`${label} (${l.days_ago}d ago) — ${l.exercises_done}/${l.total_exercises} exercises`);
+      }
+    }
+
+    const pendingLines = pendingProgress.map(p => `${p.key}: ${p.sets_done} sets done`);
+
+    const context = `Recent workouts (last 14 days): ${historyLines.length ? historyLines.join(', ') : 'None'}
+Pending/incomplete exercises: ${pendingLines.length ? pendingLines.join(', ') : 'None'}
+User state: mood=${mood}, energy=${energy}/10, preferences=${preferences}`;
+
+    const systemPrompt = `You are a personal trainer. The user has 4 workout programs:
+- A (Squat Day): Barbell Back Squat, Bench Press, Bent-Over Row + accessories + abs
+- B (Deadlift Day): Deadlift, Overhead Press, Pull-Ups + accessories + abs
+- C (Front Squat Day): Front Squat, Dumbbell Bench, Cable Row + accessories + abs
+- D (HIIT Day): Sprint intervals, Core circuit, Stretching (~45 min, lighter day)
+
+Given the user's current state and recent workout history, recommend ONE program (A, B, C, or D).
+Consider: what they haven't done recently, muscle recovery time, their energy/mood, and preferences.
+Be terse — reason in 1-2 sentences. Return JSON only, no markdown fences:
+{ "program": "A", "reason": "You haven't squatted in 3 days and your energy is high", "modification": "Add 2 extra sets on squats" or null }`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 256,
+        messages: [{ role: 'user', content: context }],
+        system: systemPrompt,
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Recommend API error:', response.status, errBody);
+      return res.status(502).json({ error: 'Claude API error: ' + response.status });
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const recommendation = JSON.parse(jsonStr);
+    res.json(recommendation);
+  } catch (e) {
+    console.error('Recommend error:', e);
+    // Fallback: random program
+    const fallback = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)];
+    res.json({ program: fallback, reason: 'Random pick — AI recommendation unavailable.', modification: null });
+  }
+});
+
 // ---- AI WORKOUT GENERATOR ----
 
 app.post('/api/workout/generate', async (req, res) => {
