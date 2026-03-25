@@ -74,6 +74,21 @@ async function initDB() {
     EXCEPTION WHEN duplicate_column THEN NULL;
     END $$;
 
+    -- Body measurements
+    CREATE TABLE IF NOT EXISTS body_measurements (
+      id SERIAL PRIMARY KEY,
+      logged_date DATE NOT NULL,
+      weight_kg NUMERIC(5,2),
+      waist_cm NUMERIC(5,1),
+      chest_cm NUMERIC(5,1),
+      left_arm_cm NUMERIC(5,1),
+      right_arm_cm NUMERIC(5,1),
+      shoulders_cm NUMERIC(5,1),
+      body_fat_pct NUMERIC(4,1),
+      notes TEXT DEFAULT '',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     -- Exercise notes
     CREATE TABLE IF NOT EXISTS exercise_notes (
       key VARCHAR(20) PRIMARY KEY,
@@ -285,6 +300,90 @@ Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed
   }
 });
 
+// POST /api/food/reanalyze — re-analyze with user-provided dish name
+app.post('/api/food/reanalyze', async (req, res) => {
+  const { id, dish_name, image_base64, mime_type } = req.body;
+  if (!dish_name) return res.status(400).json({ error: 'dish_name required' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
+
+  const prompt = `You are a strict paleo diet analyzer and food critic. The user tells you this dish is: "${dish_name}". ${image_base64 ? 'Use the photo for additional context.' : ''} Analyze it and return ONLY a JSON object, no markdown, no explanation.
+
+{
+  "description": "${dish_name}",
+  "is_paleo": true/false,
+  "verdict": "one sentence verdict, plain language",
+  "meal_time": "breakfast" | "lunch" | "dinner" | "snack",
+  "health_score": 1-10,
+  "health_reason": "one sentence explaining the health score",
+  "culinary_score": 1-10,
+  "culinary_reason": "one sentence explaining the culinary score",
+  "flags": [
+    {
+      "ingredient": "name",
+      "status": "ok" | "warn" | "bad",
+      "reason": "one short sentence"
+    }
+  ]
+}
+
+health_score: 1=very unhealthy, 10=extremely nutritious. Consider nutrient density, balance, whole foods, processing level.
+culinary_score: 1=poorly made/presented, 10=restaurant quality. Consider presentation, cooking technique, flavor combinations, creativity.
+
+Paleo rules: no grains, no legumes, no dairy (strict), no refined sugar, no seed oils, no artificial additives. Flag anything borderline as warn.`;
+
+  try {
+    const content = [];
+    if (image_base64 && mime_type) {
+      content.push({ type: 'image', source: { type: 'base64', media_type: mime_type, data: image_base64 } });
+    }
+    content.push({ type: 'text', text: prompt });
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Claude API error:', response.status, errBody);
+      return res.status(502).json({ error: 'Claude API error: ' + response.status });
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const analysis = JSON.parse(jsonStr);
+
+    // If id provided, update the food entry in DB
+    if (id) {
+      await pool.query(`
+        UPDATE food_log SET description = $1, is_paleo = $2, verdict = $3, flags = $4,
+          health_score = $5, health_reason = $6, culinary_score = $7, culinary_reason = $8,
+          meal_time = $9, user_override = FALSE
+        WHERE id = $10
+      `, [analysis.description, analysis.is_paleo, analysis.verdict, JSON.stringify(analysis.flags || []),
+          analysis.health_score, analysis.health_reason, analysis.culinary_score, analysis.culinary_reason,
+          analysis.meal_time, id]);
+    }
+
+    res.json(analysis);
+  } catch (e) {
+    console.error('Re-analyze error:', e);
+    res.status(500).json({ error: 'Re-analysis failed: ' + e.message });
+  }
+});
+
 // POST /api/food — save a food entry
 app.post('/api/food', async (req, res) => {
   const { date, meal_time, description, is_paleo, verdict, flags, notes, image_data, health_score, health_reason, culinary_score, culinary_reason } = req.body;
@@ -320,15 +419,21 @@ app.get('/api/food', async (req, res) => {
   }
 });
 
-// PATCH /api/food/:id — update a food entry (verdict override, notes, etc.)
+// PATCH /api/food/:id — update a food entry
 app.patch('/api/food/:id', async (req, res) => {
-  const { is_paleo, verdict, notes } = req.body;
+  const { is_paleo, verdict, notes, description, flags, health_score, health_reason, culinary_score, culinary_reason } = req.body;
   const sets = [];
   const vals = [];
   let i = 1;
   if (is_paleo !== undefined) { sets.push(`is_paleo = $${i++}`); vals.push(is_paleo); sets.push(`user_override = $${i++}`); vals.push(true); }
   if (verdict !== undefined) { sets.push(`verdict = $${i++}`); vals.push(verdict); }
   if (notes !== undefined) { sets.push(`notes = $${i++}`); vals.push(notes); }
+  if (description !== undefined) { sets.push(`description = $${i++}`); vals.push(description); }
+  if (flags !== undefined) { sets.push(`flags = $${i++}`); vals.push(JSON.stringify(flags)); }
+  if (health_score !== undefined) { sets.push(`health_score = $${i++}`); vals.push(health_score); }
+  if (health_reason !== undefined) { sets.push(`health_reason = $${i++}`); vals.push(health_reason); }
+  if (culinary_score !== undefined) { sets.push(`culinary_score = $${i++}`); vals.push(culinary_score); }
+  if (culinary_reason !== undefined) { sets.push(`culinary_reason = $${i++}`); vals.push(culinary_reason); }
   if (!sets.length) return res.status(400).json({ error: 'Nothing to update' });
   vals.push(req.params.id);
   try {
@@ -520,6 +625,47 @@ app.get('/api/feed', async (req, res) => {
     console.error('Feed error:', e);
     res.json([]);
   }
+});
+
+// ---- BODY MEASUREMENTS ----
+
+// GET /api/measurements?limit=30
+app.get('/api/measurements', async (req, res) => {
+  const limit = parseInt(req.query.limit) || 30;
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, TO_CHAR(logged_date, 'YYYY-MM-DD') as logged_date, weight_kg, waist_cm, chest_cm, left_arm_cm, right_arm_cm, shoulders_cm, body_fat_pct, notes, created_at
+       FROM body_measurements ORDER BY logged_date DESC, created_at DESC LIMIT $1`, [limit]
+    );
+    res.json(rows);
+  } catch (e) {
+    console.error('Measurements fetch error:', e);
+    res.json([]);
+  }
+});
+
+// POST /api/measurements
+app.post('/api/measurements', async (req, res) => {
+  const { logged_date, weight_kg, waist_cm, chest_cm, left_arm_cm, right_arm_cm, shoulders_cm, body_fat_pct, notes } = req.body;
+  if (!logged_date) return res.status(400).json({ error: 'logged_date required' });
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO body_measurements (logged_date, weight_kg, waist_cm, chest_cm, left_arm_cm, right_arm_cm, shoulders_cm, body_fat_pct, notes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       RETURNING id, TO_CHAR(logged_date, 'YYYY-MM-DD') as logged_date, weight_kg, waist_cm, chest_cm, left_arm_cm, right_arm_cm, shoulders_cm, body_fat_pct, notes`,
+      [logged_date, weight_kg || null, waist_cm || null, chest_cm || null, left_arm_cm || null, right_arm_cm || null, shoulders_cm || null, body_fat_pct || null, notes || '']
+    );
+    res.json(rows[0]);
+  } catch (e) {
+    console.error('Measurements save error:', e);
+    res.status(500).json({ error: 'Save failed' });
+  }
+});
+
+// DELETE /api/measurements/:id
+app.delete('/api/measurements/:id', async (req, res) => {
+  await pool.query('DELETE FROM body_measurements WHERE id = $1', [req.params.id]);
+  res.json({ ok: true });
 });
 
 const PORT = process.env.PORT || 3000;

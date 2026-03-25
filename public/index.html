@@ -762,6 +762,59 @@ body {
 .bottom-nav-item .nav-icon { font-size: 22px; line-height: 1; }
 .bottom-nav-item.active { color: var(--red); }
 
+/* PROGRESS TAB */
+.meas-form {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px; margin-bottom: 16px;
+}
+.meas-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.meas-field label {
+  display: block; font-size: 11px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.meas-field input {
+  width: 100%; background: var(--card2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; color: var(--text);
+  font-size: 16px; font-family: inherit; outline: none;
+}
+.meas-field input:focus { border-color: var(--red); }
+.sparkline-wrap {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px; overflow: hidden;
+}
+.sparkline-wrap svg { width: 100%; height: 80px; }
+.sparkline-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--muted); margin-top: 6px;
+}
+.diff-pills {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;
+}
+.diff-pill {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px 14px; font-size: 13px;
+}
+.diff-pill .diff-label { color: var(--muted); font-size: 11px; display: block; }
+.diff-pill .diff-val { font-weight: 700; }
+.diff-pill .diff-val.up { color: var(--red); }
+.diff-pill .diff-val.down { color: #2ecc71; }
+.diff-pill .diff-val.same { color: var(--muted); }
+.meas-row {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+}
+.meas-row-date { font-weight: 600; min-width: 80px; font-size: 13px; }
+.meas-row-vals { flex: 1; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.meas-row-vals span { color: var(--text); font-weight: 500; }
+.meas-row-del {
+  background: none; border: none; color: var(--muted); font-size: 14px;
+  cursor: pointer; padding: 4px; opacity: 0.5; transition: opacity .2s;
+}
+.meas-row-del:hover { opacity: 1; color: var(--red); }
+
 /* FEED */
 .feed-day-header {
   font-family: 'Bebas Neue', sans-serif;
@@ -808,6 +861,100 @@ body {
 .feed-workout-bar-fill { height: 100%; background: var(--green); border-radius: 3px; }
 .feed-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
 .feed-empty .ico { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
+
+/* FEED CARD ACTIONS */
+.feed-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+}
+.feed-action-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.feed-action-btn:hover { border-color: var(--red); color: var(--red); }
+.feed-action-btn.correct { border-color: #f39c12; color: #f39c12; }
+.feed-action-btn.correct:hover { background: rgba(243,156,18,0.1); }
+
+/* CORRECT DISH INLINE */
+.correct-dish-form {
+  display: none;
+  padding: 10px 16px;
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+  gap: 8px;
+}
+.correct-dish-form.show { display: flex; }
+.correct-dish-input {
+  flex: 1;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+}
+.correct-dish-input:focus { outline: none; border-color: var(--red); }
+.correct-dish-submit {
+  background: var(--red);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.correct-dish-loading {
+  display: none;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+}
+.correct-dish-loading.show { display: block; }
+/* FEED COMMENT INLINE */
+.feed-comment-form {
+  display: flex;
+  padding: 8px 16px;
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+  gap: 8px;
+  align-items: center;
+}
+.feed-comment-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.feed-comment-input::placeholder { color: var(--muted); opacity: 0.6; }
+.feed-comment-post {
+  background: none;
+  border: none;
+  color: var(--red);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.feed-comment-post.visible { opacity: 1; pointer-events: auto; }
 
 /* WORKOUT SUB-TABS */
 .workout-day-tabs {
@@ -1174,10 +1321,10 @@ body {
 <!-- WORKOUT PANEL -->
 <div class="panel" id="panel-workout">
   <div class="workout-day-tabs">
-    <button class="workout-day-tab active" onclick="switchWorkoutDay('a')"><span class="big">A</span>Squat</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('b')"><span class="big">B</span>Deadlift</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('c')"><span class="big">C</span>Front Sq</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('d')"><span class="big">D</span>HIIT</button>
+    <button class="workout-day-tab active" onclick="switchWorkoutDay('a')"><span class="big">A</span>Push</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('b')"><span class="big">B</span>Pull</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('c')"><span class="big">C</span>Legs</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('d')"><span class="big">D</span>Core</button>
   </div>
 
 <!-- DAY A -->
@@ -2052,10 +2199,10 @@ body {
       <div class="diary-modal-date" id="diary-modal-date">14 Mar 2026</div>
       <div class="diary-modal-label">What did you do?</div>
       <div class="diary-type-btns" id="diary-type-btns">
-        <button class="diary-type-btn" data-type="a" onclick="selectDiaryType('a')"><span class="big">A</span>Squat</button>
-        <button class="diary-type-btn" data-type="b" onclick="selectDiaryType('b')"><span class="big">B</span>Deadlift</button>
-        <button class="diary-type-btn" data-type="c" onclick="selectDiaryType('c')"><span class="big">C</span>Front Sq</button>
-        <button class="diary-type-btn" data-type="d" onclick="selectDiaryType('d')"><span class="big">D</span>HIIT</button>
+        <button class="diary-type-btn" data-type="a" onclick="selectDiaryType('a')"><span class="big">A</span>Push</button>
+        <button class="diary-type-btn" data-type="b" onclick="selectDiaryType('b')"><span class="big">B</span>Pull</button>
+        <button class="diary-type-btn" data-type="c" onclick="selectDiaryType('c')"><span class="big">C</span>Legs</button>
+        <button class="diary-type-btn" data-type="d" onclick="selectDiaryType('d')"><span class="big">D</span>Core</button>
       </div>
       <textarea class="diary-notes" id="diary-notes" placeholder="Notes (optional)..." rows="3"></textarea>
       <button class="diary-save-btn" id="diary-save-btn" onclick="saveDiaryEntry()">Save</button>
@@ -2146,6 +2293,51 @@ body {
   <div id="history-list"><div class="history-empty"><span class="ico">⏳</span>Loading history...</div></div>
 </div>
 
+<!-- PROGRESS PANEL -->
+<div class="panel" id="panel-progress">
+  <div class="section-label">📏 Log Measurements</div>
+  <div class="meas-form">
+    <div class="meas-grid">
+      <div class="meas-field">
+        <label>Weight (kg)</label>
+        <input type="number" step="0.1" id="meas-weight" placeholder="74.5">
+      </div>
+      <div class="meas-field">
+        <label>Waist (cm)</label>
+        <input type="number" step="0.1" id="meas-waist" placeholder="82">
+      </div>
+      <div class="meas-field">
+        <label>Chest (cm)</label>
+        <input type="number" step="0.1" id="meas-chest" placeholder="96">
+      </div>
+      <div class="meas-field">
+        <label>Arms (cm)</label>
+        <input type="number" step="0.1" id="meas-arms" placeholder="34">
+      </div>
+      <div class="meas-field">
+        <label>Shoulders (cm)</label>
+        <input type="number" step="0.1" id="meas-shoulders" placeholder="112">
+      </div>
+      <div class="meas-field">
+        <label>Body Fat %</label>
+        <input type="number" step="0.1" id="meas-bf" placeholder="15">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveMeasurement()" style="width:100%;margin-top:12px;">Save Measurements</button>
+  </div>
+
+  <div class="section-label" style="margin-top:24px;">📈 Weight Trend</div>
+  <div class="sparkline-wrap" id="sparkline-wrap">
+    <div class="food-empty" style="padding:30px">Log measurements to see your trend</div>
+  </div>
+
+  <div class="section-label" style="margin-top:24px;">📊 Changes</div>
+  <div class="diff-pills" id="diff-pills"></div>
+
+  <div class="section-label" style="margin-top:24px;">📋 History</div>
+  <div id="meas-history"></div>
+</div>
+
 </div><!-- end content -->
 
 <!-- BOTTOM NAV -->
@@ -2165,6 +2357,10 @@ body {
   <button class="bottom-nav-item" onclick="switchTab('history')">
     <span class="nav-icon">📊</span>
     <span>History</span>
+  </button>
+  <button class="bottom-nav-item" onclick="switchTab('progress')">
+    <span class="nav-icon">📏</span>
+    <span>Progress</span>
   </button>
 </div>
 
@@ -2210,17 +2406,23 @@ function setSyncStatus(status) {
 
 // ---- GIF LOADING ----
 const gifMap = {
-  'a-0': 'barbell squat', 'a-1': 'barbell bench press', 'a-2': 'bent over barbell row',
-  'a-3': 'dumbbell lunge', 'a-4': 'incline dumbbell press', 'a-5': 'cable face pull',
-  'a-6': 'hanging leg raise', 'a-7': 'plank', 'a-8': 'cable woodchop',
-  'b-0': 'deadlift', 'b-1': 'barbell overhead press', 'b-2': 'pull up',
-  'b-3': 'romanian deadlift', 'b-4': 'lateral raise', 'b-5': 'barbell curl',
-  'b-6': 'ab wheel', 'b-7': 'russian twist', 'b-8': 'dead bug',
-  'c-0': 'front squat', 'c-1': 'dumbbell bench press', 'c-2': 'seated cable row',
-  'c-3': 'bulgarian split squat', 'c-4': 'dip', 'c-5': 'hammer curl',
-  'c-6': 'decline sit up', 'c-7': 'mountain climber', 'c-8': 'pallof press',
-  'd-0': 'sprint', 'd-1': 'hanging knee raise', 'd-2': 'side plank',
-  'd-3': 'bicycle crunch', 'd-4': 'plank push up',
+  // A — Push
+  'a-0': 'arm circles', 'a-1': 'push up', 'a-2': 'wide push up',
+  'a-3': 'pike push up', 'a-4': 'medicine ball chest pass', 'a-5': 'tricep dips',
+  'a-6': 'diamond push up', 'a-7': 'plank pike', 'a-8': 'plank',
+  // B — Pull
+  'b-0': 'dead hang', 'b-1': 'pull up', 'b-2': 'inverted row',
+  'b-3': 'bicep curl', 'b-4': 'medicine ball slam', 'b-5': 'medicine ball rotational throw',
+  'b-6': 'hollow body hold', 'b-7': 'hanging knee raise', 'b-8': 'dead bug',
+  // C — Legs
+  'c-0': 'leg swing', 'c-1': 'bodyweight squat', 'c-2': 'reverse lunge',
+  'c-3': 'pistol squat', 'c-4': 'lateral lunge', 'c-5': 'glute bridge',
+  'c-6': 'hip stretch', 'c-7': 'hip flexor stretch', 'c-8': 'hamstring stretch',
+  // D — Core
+  'd-0': 'crunch', 'd-1': 'bicycle crunch', 'd-2': 'leg raise',
+  'd-3': 'side plank', 'd-4': 'russian twist', 'd-5': 'woodchop',
+  'd-6': 'mountain climber', 'd-7': 'cat cow stretch', 'd-8': 'child pose',
+  'd-9': 'full body stretch',
 };
 const gifCache = {};
 
@@ -2260,14 +2462,14 @@ function showGif(el, url) {
 }
 
 // ---- STATE ----
-const counts = { a: 9, b: 9, c: 9, d: 6 };
+const counts = { a: 9, b: 9, c: 9, d: 10 };
 const done = { a: new Set(), b: new Set(), c: new Set(), d: new Set() };
 const setsDone = {};
 const setSizes = {
-  'a-0':4,'a-1':4,'a-2':4,'a-3':3,'a-4':3,'a-5':3,'a-6':3,'a-7':3,'a-8':3,
-  'b-0':4,'b-1':4,'b-2':4,'b-3':3,'b-4':3,'b-5':3,'b-6':3,'b-7':3,'b-8':3,
-  'c-0':4,'c-1':4,'c-2':4,'c-3':3,'c-4':3,'c-5':3,'c-6':3,'c-7':3,'c-8':3,
-  'd-0':10,'d-1':3,'d-2':3,'d-3':3,'d-4':3,'d-5':1,
+  'a-0':2,'a-1':4,'a-2':3,'a-3':3,'a-4':3,'a-5':3,'a-6':3,'a-7':3,'a-8':3,
+  'b-0':2,'b-1':4,'b-2':3,'b-3':3,'b-4':3,'b-5':3,'b-6':3,'b-7':3,'b-8':3,
+  'c-0':2,'c-1':3,'c-2':3,'c-3':3,'c-4':3,'c-5':3,'c-6':2,'c-7':2,'c-8':2,
+  'd-0':3,'d-1':3,'d-2':3,'d-3':3,'d-4':3,'d-5':3,'d-6':3,'d-7':2,'d-8':2,'d-9':1,
 };
 
 // ---- LOAD FROM SERVER ON STARTUP ----
@@ -3003,7 +3205,7 @@ function switchTab(tab) {
   currentTab = tab;
   // Update bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
-  const tabs = ['feed','workout','diary','history'];
+  const tabs = ['feed','workout','diary','history','progress'];
   const navItems = document.querySelectorAll('.bottom-nav-item');
   const idx = tabs.indexOf(tab);
   if (navItems[idx]) navItems[idx].classList.add('active');
@@ -3012,7 +3214,7 @@ function switchTab(tab) {
   document.querySelectorAll('.content > .panel').forEach(p => p.classList.remove('active'));
 
   // Map tab to panel
-  const panelMap = { feed: 'panel-feed', workout: 'panel-workout', diary: 'panel-diary', history: 'panel-h' };
+  const panelMap = { feed: 'panel-feed', workout: 'panel-workout', diary: 'panel-diary', history: 'panel-h', progress: 'panel-progress' };
   const panel = document.getElementById(panelMap[tab]);
   if (panel) panel.classList.add('active');
 
@@ -3023,6 +3225,7 @@ function switchTab(tab) {
   if (tab === 'feed') loadFeed();
   if (tab === 'history') loadHistory();
   if (tab === 'diary') renderDiary();
+  if (tab === 'progress') loadProgressTab();
 }
 
 // ---- SWITCH WORKOUT DAY (sub-tabs within workout) ----
@@ -3131,11 +3334,17 @@ async function loadFeed() {
             scoresHtml += '</div>';
           }
 
-          html += `<div class="food-card">
+          const escapedDesc = (e.description || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+          const escapedNote = (e.notes || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+          html += `<div class="food-card" id="feed-food-${e.id}">
             <div class="food-card-header">
               <div class="food-card-avatar">JM</div>
               <div class="food-card-meta">
                 <strong>${e.description || 'Meal'}</strong> · <span class="time">${dateTimeStr}</span>
+              </div>
+              <div class="food-card-actions">
+                <button class="food-card-btn del" onclick="feedDeleteFood(${e.id})" title="Delete">🗑️</button>
               </div>
             </div>
             ${imgHtml}
@@ -3148,6 +3357,21 @@ async function loadFeed() {
               ${scoresHtml}
               ${flagsHtml}
               ${noteHtml}
+            </div>
+            <div class="feed-card-actions">
+              <button class="feed-action-btn correct" onclick="toggleCorrectDish(${e.id})">🔄 Not this?</button>
+              <button class="feed-action-btn" onclick="feedOverrideFood(${e.id}, ${!e.is_paleo})">${e.is_paleo ? '❌ Not paleo' : '✅ Mark paleo'}</button>
+            </div>
+            <div class="correct-dish-form" id="correct-form-${e.id}">
+              <input class="correct-dish-input" id="correct-input-${e.id}" type="text" placeholder="What is this dish?" value="${escapedDesc}">
+              <button class="correct-dish-submit" onclick="submitCorrectDish(${e.id})">Re-score</button>
+            </div>
+            <div class="correct-dish-loading" id="correct-loading-${e.id}">🔍 Re-analyzing...</div>
+            <div class="feed-comment-form">
+              <input class="feed-comment-input" type="text" placeholder="Add a note..." value="${escapedNote}"
+                oninput="this.nextElementSibling.classList.toggle('visible', this.value !== '${escapedNote}')"
+                id="feed-comment-${e.id}">
+              <button class="feed-comment-post" onclick="feedSaveComment(${e.id})">Post</button>
             </div>
           </div>`;
         }
@@ -3218,45 +3442,49 @@ let editExercises = [];
 // Default programs (matching the hardcoded HTML)
 const defaultPrograms = {
   a: [
-    { section: '🔥 Compound Lifts', name: 'Barbell Back Squat', sets: 4, reps: '8–10', rest: '90s', cues: 'Chest up, knees track toes. Drive through heels. Break parallel. Brace core before descent.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Barbell Bench Press', sets: 4, reps: '8–10', rest: '90s', cues: 'Retract scapula. Touch lower chest. Full lock-out at top. Feet flat on floor.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Bent-Over Barbell Row', sets: 4, reps: '8–10', rest: '90s', cues: 'Hinge at hips, back flat. Pull bar to navel. Squeeze shoulder blades together at top.', icon: '🏋️' },
-    { section: '💪 Accessory Work', name: 'Dumbbell Lunges', sets: 3, reps: '10–12 each', rest: '60s', cues: 'Step forward, back knee near floor. Front shin vertical. Drive through front heel to return.', icon: '🦵' },
-    { section: '💪 Accessory Work', name: 'Incline Dumbbell Press', sets: 3, reps: '10–12', rest: '60s', cues: '30–45° incline. Arch slightly. Lower to upper chest. Full stretch at bottom.', icon: '💪' },
-    { section: '💪 Accessory Work', name: 'Cable Face Pulls', sets: 3, reps: '15–20', rest: '45s', cues: 'Elbows high and wide. Pull to forehead. External rotate at end. Light weight, perfect form.', icon: '🎯' },
-    { section: '🎯 Abs — 10 min', name: 'Hanging Leg Raises', sets: 3, reps: '12–15', rest: '30s', cues: 'Dead hang start. Raise legs to 90°. No swinging. Control the descent slowly.', icon: '🎯' },
-    { section: '🎯 Abs — 10 min', name: 'Plank Hold', sets: 3, reps: '45–60s', rest: '30s', cues: 'Neutral spine. Squeeze glutes. Don\'t let hips sag or pike. Breathe steadily.', icon: '🧱' },
-    { section: '🎯 Abs — 10 min', name: 'Cable Woodchops', sets: 3, reps: '12 each side', rest: '30s', cues: 'Rotate through core, not arms. Arms stay straight. Full range of motion each rep.', icon: '🌀' },
+    { section: '🔄 Warm-up', name: 'Arm Circles & Shoulder Rolls', sets: 2, reps: '30s', rest: '15s', cues: 'Big slow circles forward and back. Loosen the shoulder joint before loading.', icon: '🔄' },
+    { section: '🤸 Push — Chest', name: 'Standard Push-Ups', sets: 4, reps: '15–20', rest: '45s', cues: 'Hands slightly wider than shoulders. Chest touches floor each rep. No half reps.', icon: '🤸' },
+    { section: '🤸 Push — Chest', name: 'Wide Push-Ups', sets: 3, reps: '12–15', rest: '45s', cues: 'Hands 1.5x shoulder width. Elbows flare out. Emphasizes outer chest.', icon: '🤸' },
+    { section: '🤸 Push — Shoulders', name: 'Pike Push-Ups', sets: 3, reps: '10–12', rest: '60s', cues: 'Hips high, body in inverted V. Lower forehead to floor. Vertical push hits deltoids.', icon: '🤸' },
+    { section: '🏐 Medicine Ball', name: 'Med Ball Chest Pass (wall)', sets: 3, reps: '12', rest: '45s', cues: 'Stand 1m from wall. Explosive chest pass. Catch and reset. Full arm extension each rep.', icon: '🏐' },
+    { section: '💪 Push — Triceps', name: 'Tricep Dips (bench/chair)', sets: 3, reps: '12–15', rest: '45s', cues: 'Hands behind, fingers forward. Lower until elbows at 90°. Elbows stay close to body.', icon: '💪' },
+    { section: '💪 Push — Triceps', name: 'Diamond Push-Ups', sets: 3, reps: '10–12', rest: '45s', cues: 'Index fingers and thumbs touching. Elbows back, not flared. Slow descent.', icon: '💎' },
+    { section: '🎯 Abs Finisher', name: 'Plank to Pike', sets: 3, reps: '10', rest: '30s', cues: 'High plank. Drive hips up into pike. Return. Keep arms straight throughout.', icon: '🎯' },
+    { section: '🎯 Abs Finisher', name: 'Plank Hold', sets: 3, reps: '45–60s', rest: '30s', cues: 'Neutral spine. Squeeze glutes. Don\'t let hips sag or pike. Breathe steadily.', icon: '🧱' },
   ],
   b: [
-    { section: '🔥 Compound Lifts', name: 'Deadlift', sets: 4, reps: '6–8', rest: '2 min', cues: 'Bar over mid-foot. Hinge — not squat. Chest up, lats tight. Drive hips through at top.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Overhead Press (Barbell)', sets: 4, reps: '8–10', rest: '90s', cues: 'Bar from upper chest. Head through at top. Glutes and core tight. Full lockout overhead.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Weighted Pull-Ups / Lat Pulldown', sets: 4, reps: '8–10', rest: '90s', cues: 'Full dead hang at bottom. Pull elbows to hips. Chest to bar. No half reps.', icon: '🏋️' },
-    { section: '💪 Accessory Work', name: 'Romanian Deadlift (DB)', sets: 3, reps: '10–12', rest: '60s', cues: 'Soft knee. Push hips back — not down. Feel hamstring stretch. Keep back flat throughout.', icon: '🦵' },
-    { section: '💪 Accessory Work', name: 'Dumbbell Lateral Raises', sets: 3, reps: '12–15', rest: '45s', cues: 'Slight forward lean. Lead with elbows. Stop at shoulder height. Light weight, high reps.', icon: '💪' },
-    { section: '💪 Accessory Work', name: 'Barbell Bicep Curls', sets: 3, reps: '10–12', rest: '45s', cues: 'Elbows pinned to sides. Full range of motion. Squeeze at top. No swinging.', icon: '💪' },
-    { section: '🎯 Abs — 10 min', name: 'Ab Wheel Rollouts', sets: 3, reps: '10–12', rest: '30s', cues: 'Kneel. Roll out slowly. Pull back with core — not arms. Lower back stays flat.', icon: '🎯' },
-    { section: '🎯 Abs — 10 min', name: 'Russian Twists (Weighted)', sets: 3, reps: '20 total', rest: '30s', cues: 'Lean back 45°. Rotate fully each side. Feet off floor is harder. Hold weight with both hands.', icon: '🌀' },
-    { section: '🎯 Abs — 10 min', name: 'Dead Bugs', sets: 3, reps: '12 each side', rest: '30s', cues: 'Lower back flat to floor — always. Opposite arm and leg extend slowly. Breathe out on extension.', icon: '🪲' },
+    { section: '🔄 Warm-up', name: 'Dead Hang', sets: 2, reps: '30–45s', rest: '20s', cues: 'Relaxed grip, shoulders packed. Decompress spine. Focus on grip strength.', icon: '🔄' },
+    { section: '🏋️ Pull — Back', name: 'Pull-Ups', sets: 4, reps: '6–10', rest: '90s', cues: 'Full dead hang at bottom. Pull elbows to hips. Chest to bar. No half reps.', icon: '🏋️' },
+    { section: '🏋️ Pull — Back', name: 'Inverted Rows', sets: 3, reps: '12–15', rest: '60s', cues: 'Body straight as a board. Pull chest to bar. Squeeze shoulder blades at top.', icon: '🔄' },
+    { section: '💪 Pull — Biceps', name: 'Towel/Band Curls', sets: 3, reps: '12', rest: '45s', cues: 'Lean back slightly. Curl body up. Full range. Keep elbows stationary.', icon: '💪' },
+    { section: '🏐 Medicine Ball', name: 'Med Ball Slams', sets: 3, reps: '10', rest: '60s', cues: 'Full overhead extension. Slam DOWN with force. Squat to pick up. Explosive every rep.', icon: '🏐' },
+    { section: '🏐 Medicine Ball', name: 'Med Ball Rotational Throws', sets: 3, reps: '10 each', rest: '45s', cues: 'Stand sideways to wall. Rotate from core. Explosive throw. Power from hips, not arms.', icon: '🏐' },
+    { section: '🎯 Core Circuit', name: 'Hollow Body Hold', sets: 3, reps: '30–45s', rest: '30s', cues: 'Lower back pressed flat. Arms overhead, legs raised. The tighter the better.', icon: '🎯' },
+    { section: '🎯 Core Circuit', name: 'Hanging Knee Raises', sets: 3, reps: '12–15', rest: '30s', cues: 'Dead hang start. Knees to chest. Slow on the way down. No swinging.', icon: '🎯' },
+    { section: '🎯 Core Circuit', name: 'Dead Bugs', sets: 3, reps: '12 each', rest: '30s', cues: 'Lower back flat to floor. Opposite arm and leg extend slowly. Breathe out on extension.', icon: '🪲' },
   ],
   c: [
-    { section: '🔥 Compound Lifts', name: 'Front Squat / Goblet Squat', sets: 4, reps: '8–10', rest: '90s', cues: 'Elbows high. Upright torso. Sit between heels. Core braced throughout.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Dumbbell Bench Press (Flat)', sets: 4, reps: '8–10', rest: '90s', cues: 'Full stretch at bottom. Press up and slightly in. Control descent. Greater range than barbell.', icon: '🏋️' },
-    { section: '🔥 Compound Lifts', name: 'Cable Row (Seated)', sets: 4, reps: '10–12', rest: '60s', cues: 'Sit tall. Pull to belly. Squeeze shoulder blades at end. Don\'t lean back.', icon: '🏋️' },
-    { section: '💪 Accessory Work', name: 'Bulgarian Split Squat', sets: 3, reps: '10 each', rest: '60s', cues: 'Rear foot elevated. Front foot far enough forward. Drop straight down. Don\'t let knee cave.', icon: '🦵' },
-    { section: '💪 Accessory Work', name: 'Dips (BW or Weighted)', sets: 3, reps: '10–12', rest: '60s', cues: 'Lean forward for chest focus. Full lockout at top. Control descent. Add weight when 12 reps feel easy.', icon: '💪' },
-    { section: '💪 Accessory Work', name: 'Hammer Curls', sets: 3, reps: '10–12', rest: '45s', cues: 'Neutral grip (thumbs up). Elbows pinned. Control the descent. Hits brachialis for arm thickness.', icon: '💪' },
-    { section: '🎯 Abs — 10 min', name: 'Decline Sit-Ups (Weighted)', sets: 3, reps: '15', rest: '30s', cues: 'Hold plate to chest. Full range. Don\'t yank your neck. Control on the way down.', icon: '🎯' },
-    { section: '🎯 Abs — 10 min', name: 'Mountain Climbers', sets: 3, reps: '30 sec', rest: '30s', cues: 'High plank. Drive knees fast alternating. Hips stay level. Core tight throughout.', icon: '⛰️' },
-    { section: '🎯 Abs — 10 min', name: 'Pallof Press (Cable)', sets: 3, reps: '12 each side', rest: '30s', cues: 'Stand side-on to cable. Press and hold. Resist rotation. Anti-rotation = strong core.', icon: '🌀' },
+    { section: '🔄 Warm-up', name: 'Leg Swings (forward + lateral)', sets: 2, reps: '15 each', rest: '15s', cues: 'Hold wall for balance. Forward: big pendulum. Lateral: across body. Loosens hip flexors.', icon: '🔄' },
+    { section: '🦵 Lower Body', name: 'Bodyweight Squats', sets: 3, reps: '20', rest: '45s', cues: 'Feet shoulder-width. Chest up. Sit between heels. Hit parallel or below every rep.', icon: '🦵' },
+    { section: '🦵 Lower Body', name: 'Reverse Lunges', sets: 3, reps: '12 each', rest: '60s', cues: 'Step back, not forward. Front shin vertical. Drop back knee near floor.', icon: '🦵' },
+    { section: '🦵 Lower Body', name: 'Pistol Squat Progressions', sets: 3, reps: '6–8 each', rest: '90s', cues: 'Use a doorframe or chair for assist. Work the bottom position. Single-leg strength + balance.', icon: '🦵' },
+    { section: '🏐 Medicine Ball', name: 'Med Ball Lateral Lunges', sets: 3, reps: '10 each', rest: '60s', cues: 'Hold ball at chest. Step wide laterally. Sit into that hip. Keep other leg straight.', icon: '🏐' },
+    { section: '🍑 Glutes', name: 'Glute Bridges', sets: 3, reps: '15–20', rest: '45s', cues: 'Feet flat, drive hips up. Squeeze glutes hard at top. Slow 2s descent.', icon: '🍑' },
+    { section: '🧘 Mobility', name: '90/90 Hip Stretch', sets: 2, reps: '60s each', rest: '20s', cues: 'Both legs at 90°. Sit tall. Lean into front shin. Breathe into tight areas.', icon: '🧘' },
+    { section: '🧘 Mobility', name: 'Hip Flexor Stretch (kneeling)', sets: 2, reps: '60s each', rest: '20s', cues: 'Back knee down. Drive hips forward. Stretch front of rear hip. Keep torso tall.', icon: '🧘' },
+    { section: '🧘 Mobility', name: 'Standing Hamstring Stretch', sets: 2, reps: '45s each', rest: '20s', cues: 'Foot on low surface. Hinge from hips, keep back flat. Hold ankle or shin.', icon: '🧘' },
   ],
   d: [
-    { section: '⚡ HIIT Cardio — 20 min', name: 'Sprint Intervals', sets: 10, reps: '30s on / 60s off', rest: '-', cues: 'ALL OUT for 30 sec — not 70%, not 80%. Full recovery for 60 sec. Assault bike works too.', icon: '💨' },
-    { section: '🎯 Core Circuit — 3 Rounds', name: 'Hanging Knee Raises', sets: 3, reps: '15', rest: 'Minimal', cues: 'Dead hang start. Knees to chest. Slow on the way down. No swinging.', icon: '🎯' },
-    { section: '🎯 Core Circuit — 3 Rounds', name: 'Side Plank (each side)', sets: 3, reps: '30–45s', rest: 'Minimal', cues: 'Stack feet or stagger for easier. Hips high — don\'t sag. Squeeze obliques.', icon: '🧱' },
-    { section: '🎯 Core Circuit — 3 Rounds', name: 'Bicycle Crunches', sets: 3, reps: '20 total', rest: 'Minimal', cues: 'Elbow to opposite knee. Full rotation each rep. Don\'t rush. Feel the oblique.', icon: '🚲' },
-    { section: '🎯 Core Circuit — 3 Rounds', name: 'Plank to Push-Up', sets: 3, reps: '10', rest: '60s between rounds', cues: 'Down to forearms and back up. Keep hips level throughout. Alternate leading arm each rep.', icon: '⬆️' },
-    { section: '🧘 Cool Down', name: 'Stretching', sets: 1, reps: '10 min', rest: '-', cues: 'Hip flexors, hamstrings, quads, chest, shoulders. Hold each stretch 30–45 sec.', icon: '🧘' },
+    { section: '🎯 Ab Circuit', name: 'Crunches', sets: 3, reps: '20', rest: '20s', cues: 'Hands behind ears. Curl shoulders to knees. Lower back stays on floor. No neck yanking.', icon: '🎯' },
+    { section: '🎯 Ab Circuit', name: 'Bicycle Crunches', sets: 3, reps: '20 total', rest: '20s', cues: 'Elbow to opposite knee. Full rotation each rep. Don\'t rush. Feel the oblique.', icon: '🚲' },
+    { section: '🎯 Ab Circuit', name: 'Leg Raises', sets: 3, reps: '15', rest: '30s', cues: 'Flat on back. Legs straight, lower to just above floor. Lower back stays down.', icon: '🎯' },
+    { section: '🎯 Ab Circuit', name: 'Side Plank (each side)', sets: 3, reps: '30–45s', rest: '20s', cues: 'Stack feet or stagger. Hips high — don\'t sag. Squeeze obliques the whole time.', icon: '🧱' },
+    { section: '🌀 Rotational Power', name: 'Med Ball Russian Twists', sets: 3, reps: '20 total', rest: '30s', cues: 'Lean back 45°. Feet off floor. Rotate ball to floor each side. Controlled.', icon: '🏐' },
+    { section: '🌀 Rotational Power', name: 'Med Ball Woodchops', sets: 3, reps: '10 each', rest: '30s', cues: 'High to low diagonal. Rotate from core, arms guide. Full follow-through.', icon: '🌀' },
+    { section: '🌀 Rotational Power', name: 'Mountain Climbers', sets: 3, reps: '30s', rest: '30s', cues: 'High plank. Drive knees alternating. Hips stay level. Core tight throughout.', icon: '⛰️' },
+    { section: '🧘 Deep Stretch', name: 'Cat-Cow', sets: 2, reps: '10', rest: '10s', cues: 'On all fours. Arch up (cat), drop belly (cow). Breathe into each position.', icon: '🧘' },
+    { section: '🧘 Deep Stretch', name: 'Child\'s Pose to Cobra Flow', sets: 2, reps: '60s', rest: '15s', cues: 'Child\'s pose: sit into heels. Flow to cobra: hips down, chest up. Hold 3s each.', icon: '🧘' },
+    { section: '🧘 Deep Stretch', name: 'Full Body Stretch Circuit', sets: 1, reps: '8 min', rest: '-', cues: 'Hip flexors → hamstrings → chest opener → spinal twist → pigeon. 45s each hold.', icon: '🧘' },
   ],
 };
 
@@ -3354,10 +3582,11 @@ async function rebuildWorkoutPanel(day) {
   if (!panel) return;
 
   // Rebuild the panel content
-  const dayLabels = { a: { title: 'Squat · Bench · Row', sub: '~60–70 min including warm-up, abs, and sauna', pills: ['🏃 10 min warm-up','🔥 Compound lifts','💪 Accessory','🎯 Abs 10 min'] },
-    b: { title: 'Deadlift · Overhead Press · Pull-Ups', sub: '~60–70 min including warm-up, abs, and sauna', pills: ['🚣 Row / jump rope','🔥 Compound lifts','💪 Accessory','🎯 Abs 10 min'] },
-    c: { title: 'Front Squat · Dumbbell Press · Rows', sub: '~60–70 min including warm-up, abs, and sauna', pills: ['🚶 Incline walk','🔥 Compound lifts','💪 Accessory','🎯 Abs 10 min'] },
-    d: { title: 'HIIT + Core', sub: '~45–50 min · Optional 4th day — only if energy is there', pills: ['⚡ 20 min HIIT','🎯 Core circuit','🧘 10 min stretch'] } };
+  const dayLabels = {
+    a: { title: 'Push · Chest · Shoulders · Triceps', sub: '~50–60 min · bodyweight + medicine ball', pills: ['🔄 Warm-up','🤸 Push movements','💪 Shoulders','🎯 Abs finisher'] },
+    b: { title: 'Pull · Back · Biceps · Core', sub: '~50–60 min · bars + medicine ball', pills: ['🔄 Warm-up','🏋️ Pull movements','💥 Medicine ball','🎯 Core circuit'] },
+    c: { title: 'Legs · Mobility · Glutes', sub: '~50–60 min · bodyweight + stretching', pills: ['🔄 Warm-up','🦵 Lower body','🏐 Med ball','🧘 Mobility'] },
+    d: { title: 'Core · Flexibility · Full Circuit', sub: '~45–50 min · abs, rotation, yoga flow', pills: ['🔥 Ab circuit','🌀 Rotational power','🧘 Deep stretch'] } };
 
   const info = dayLabels[day];
   let html = `<div class="hero"><div class="hero-day">${day.toUpperCase()}</div><div class="hero-title">${info.title}</div><div class="hero-sub">${info.sub}</div><div class="hero-pills">${info.pills.map(p => '<div class="pill">' + p + '</div>').join('')}</div></div>`;
@@ -3422,6 +3651,223 @@ async function loadCustomPrograms() {
         await rebuildWorkoutPanel(day);
       }
     } catch (e) {}
+  }
+}
+
+// ---- FEED FOOD ACTIONS ----
+function toggleCorrectDish(id) {
+  const form = document.getElementById('correct-form-' + id);
+  if (form) form.classList.toggle('show');
+}
+
+async function submitCorrectDish(id) {
+  const input = document.getElementById('correct-input-' + id);
+  const loading = document.getElementById('correct-loading-' + id);
+  const form = document.getElementById('correct-form-' + id);
+  if (!input || !input.value.trim()) return;
+
+  form.classList.remove('show');
+  loading.classList.add('show');
+
+  try {
+    // Get the image data from the card's img tag
+    const card = document.getElementById('feed-food-' + id);
+    const img = card?.querySelector('.food-card-img');
+    let image_base64 = null, mime_type = null;
+    if (img && img.src && img.src.startsWith('data:')) {
+      const parts = img.src.split(',');
+      image_base64 = parts[1];
+      mime_type = parts[0].split(':')[1].split(';')[0];
+    }
+
+    const result = await apiPost('/api/food/reanalyze', {
+      id,
+      dish_name: input.value.trim(),
+      image_base64,
+      mime_type
+    });
+
+    loading.classList.remove('show');
+    loadFeed(); // Refresh the feed
+  } catch (e) {
+    loading.classList.remove('show');
+    alert('Re-analysis failed: ' + e.message);
+  }
+}
+
+function feedDeleteFood(id) {
+  if (!confirm('Delete this meal?')) return;
+  apiDelete('/api/food/' + id).then(() => loadFeed());
+}
+
+async function feedOverrideFood(id, isPaleo) {
+  try {
+    const verdict = isPaleo ? 'Marked paleo by user' : 'Marked not paleo by user';
+    await fetch(API_URL + '/api/food/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_paleo: isPaleo, verdict })
+    });
+    loadFeed();
+  } catch (e) { console.warn('Override failed:', e); }
+}
+
+async function feedSaveComment(id) {
+  const input = document.getElementById('feed-comment-' + id);
+  if (!input) return;
+  try {
+    await fetch(API_URL + '/api/food/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: input.value.trim() })
+    });
+    const btn = input.nextElementSibling;
+    if (btn) btn.classList.remove('visible');
+  } catch (e) { console.warn('Comment save failed:', e); }
+}
+
+async function apiPatch(path, body) {
+  const res = await fetch(API_URL + path, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+// ---- PROGRESS TAB ----
+async function loadProgressTab() {
+  try {
+    const data = await apiGet('/api/measurements?limit=30');
+    renderWeightSparkline(data);
+    renderDiffStats(data);
+    renderMeasurementHistory(data);
+  } catch (e) {
+    console.warn('Progress load failed:', e);
+  }
+}
+
+function renderWeightSparkline(data) {
+  const wrap = document.getElementById('sparkline-wrap');
+  const withWeight = data.filter(d => d.weight_kg).reverse();
+  if (withWeight.length < 2) {
+    wrap.innerHTML = '<div class="food-empty" style="padding:30px">Need at least 2 weight entries to show trend</div>';
+    return;
+  }
+  const weights = withWeight.map(d => parseFloat(d.weight_kg));
+  const labels = withWeight.map(d => { const p = d.logged_date.split('-'); return p[2] + '/' + p[1]; });
+  const min = Math.min(...weights) - 1;
+  const max = Math.max(...weights) + 1;
+  const w = 300, h = 70, pad = 5;
+  const points = weights.map((v, i) => {
+    const x = pad + (i / (weights.length - 1)) * (w - pad * 2);
+    const y = pad + (1 - (v - min) / (max - min)) * (h - pad * 2);
+    return `${x},${y}`;
+  }).join(' ');
+  const lastVal = weights[weights.length - 1];
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <polyline points="${points}" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${weights.map((v, i) => {
+        const x = pad + (i / (weights.length - 1)) * (w - pad * 2);
+        const y = pad + (1 - (v - min) / (max - min)) * (h - pad * 2);
+        return `<circle cx="${x}" cy="${y}" r="3" fill="var(--red)"/>`;
+      }).join('')}
+    </svg>
+    <div class="sparkline-labels">
+      <span>${labels[0]}</span>
+      <span style="font-weight:700;color:var(--text)">${lastVal} kg</span>
+      <span>${labels[labels.length - 1]}</span>
+    </div>`;
+}
+
+function renderDiffStats(data) {
+  const pills = document.getElementById('diff-pills');
+  if (data.length < 2) { pills.innerHTML = ''; return; }
+  const latest = data[0];
+  const prev = data[1];
+  const fields = [
+    { key: 'weight_kg', label: 'Weight', unit: 'kg', invert: true },
+    { key: 'waist_cm', label: 'Waist', unit: 'cm', invert: true },
+    { key: 'chest_cm', label: 'Chest', unit: 'cm', invert: false },
+    { key: 'left_arm_cm', label: 'Arms', unit: 'cm', invert: false },
+    { key: 'shoulders_cm', label: 'Shoulders', unit: 'cm', invert: false },
+    { key: 'body_fat_pct', label: 'BF%', unit: '%', invert: true },
+  ];
+  let html = '';
+  for (const f of fields) {
+    if (!latest[f.key] || !prev[f.key]) continue;
+    const diff = (parseFloat(latest[f.key]) - parseFloat(prev[f.key])).toFixed(1);
+    const cls = diff == 0 ? 'same' : (diff > 0 ? (f.invert ? 'up' : 'down') : (f.invert ? 'down' : 'up'));
+    const sign = diff > 0 ? '+' : '';
+    html += `<div class="diff-pill"><span class="diff-label">${f.label}</span><span class="diff-val ${cls}">${sign}${diff} ${f.unit}</span></div>`;
+  }
+  pills.innerHTML = html || '<div style="color:var(--muted);font-size:13px;">Log more entries to see changes</div>';
+}
+
+function renderMeasurementHistory(data) {
+  const el = document.getElementById('meas-history');
+  if (!data.length) { el.innerHTML = '<div class="food-empty" style="padding:20px">No measurements logged yet</div>'; return; }
+  let html = '';
+  for (const d of data) {
+    const parts = [];
+    if (d.weight_kg) parts.push(`<span>${d.weight_kg}kg</span>`);
+    if (d.waist_cm) parts.push(`waist <span>${d.waist_cm}</span>`);
+    if (d.chest_cm) parts.push(`chest <span>${d.chest_cm}</span>`);
+    if (d.left_arm_cm) parts.push(`arms <span>${d.left_arm_cm}</span>`);
+    if (d.shoulders_cm) parts.push(`shoulders <span>${d.shoulders_cm}</span>`);
+    if (d.body_fat_pct) parts.push(`bf <span>${d.body_fat_pct}%</span>`);
+    const dateStr = d.logged_date.split('-').reverse().join('/');
+    html += `<div class="meas-row">
+      <div class="meas-row-date">${dateStr}</div>
+      <div class="meas-row-vals">${parts.join(' · ')}</div>
+      <button class="meas-row-del" onclick="deleteMeasurement(${d.id})">🗑️</button>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+async function saveMeasurement() {
+  const weight = document.getElementById('meas-weight').value;
+  const waist = document.getElementById('meas-waist').value;
+  const chest = document.getElementById('meas-chest').value;
+  const arms = document.getElementById('meas-arms').value;
+  const shoulders = document.getElementById('meas-shoulders').value;
+  const bf = document.getElementById('meas-bf').value;
+  if (!weight && !waist && !chest && !arms && !shoulders && !bf) { alert('Enter at least one measurement'); return; }
+  setSyncStatus('saving');
+  try {
+    await apiPost('/api/measurements', {
+      logged_date: todayStr(),
+      weight_kg: weight || null,
+      waist_cm: waist || null,
+      chest_cm: chest || null,
+      left_arm_cm: arms || null,
+      right_arm_cm: arms || null,
+      shoulders_cm: shoulders || null,
+      body_fat_pct: bf || null,
+    });
+    // Clear form
+    ['meas-weight','meas-waist','meas-chest','meas-arms','meas-shoulders','meas-bf'].forEach(id => document.getElementById(id).value = '');
+    setSyncStatus('saved');
+    loadProgressTab();
+  } catch (e) {
+    console.warn('Measurement save failed:', e);
+    setSyncStatus('');
+  }
+}
+
+async function deleteMeasurement(id) {
+  if (!confirm('Delete this measurement?')) return;
+  setSyncStatus('saving');
+  try {
+    await apiDelete('/api/measurements/' + id);
+    setSyncStatus('saved');
+    loadProgressTab();
+  } catch (e) {
+    console.warn('Measurement delete failed:', e);
+    setSyncStatus('');
   }
 }
 
