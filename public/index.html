@@ -2668,12 +2668,154 @@ function setSyncStatus(status) {
   else text.textContent = 'Ready';
 }
 
-// ---- GIF LOADING ----
+// ---- EXERCISE IMAGE DATABASE ----
+// Maps common exercise names (lowercase) to free-exercise-db slugs
+// Source: https://github.com/yuhonas/free-exercise-db (public domain)
+const EXERCISE_IMG_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
+const exerciseSlugMap = {
+  // SQUATS & LEGS
+  'barbell squat': 'Barbell_Squat', 'barbell back squat': 'Barbell_Squat', 'back squat': 'Barbell_Squat',
+  'squat': 'Barbell_Full_Squat', 'barbell full squat': 'Barbell_Full_Squat',
+  'front squat': 'Front_Barbell_Squat', 'barbell front squat': 'Front_Barbell_Squat',
+  'goblet squat': 'Goblet_Squat', 'goblet squats': 'Goblet_Squat',
+  'hack squat': 'Barbell_Hack_Squat', 'barbell hack squat': 'Barbell_Hack_Squat',
+  'leg press': 'Leg_Press', 'leg extension': 'Leg_Extensions',
+  'leg curl': 'Lying_Leg_Curls', 'lying leg curl': 'Lying_Leg_Curls', 'hamstring curl': 'Lying_Leg_Curls',
+  'seated leg curl': 'Seated_Leg_Curl',
+  'bulgarian split squat': 'Single_Leg_Push-off',
+  'lunge': 'Barbell_Lunge', 'barbell lunge': 'Barbell_Lunge', 'lunges': 'Barbell_Lunge',
+  'dumbbell lunge': 'Dumbbell_Lunges_Walking', 'dumbbell lunges': 'Dumbbell_Lunges_Walking', 'walking lunge': 'Dumbbell_Lunges_Walking',
+  'step up': 'Barbell_Step_Ups', 'step ups': 'Barbell_Step_Ups', 'barbell step ups': 'Barbell_Step_Ups',
+  'calf raise': 'Standing_Calf_Raises', 'standing calf raise': 'Standing_Calf_Raises', 'calf raises': 'Standing_Calf_Raises',
+  'seated calf raise': 'Barbell_Seated_Calf_Raise',
+  'box squat': 'Barbell_Squat_To_A_Bench',
+  'sumo squat': 'Sumo_Deadlift', 'side split squat': 'Barbell_Side_Split_Squat',
+  'wall sit': 'Wall_Squat',
+  'bodyweight squat': 'Bodyweight_Squat', 'air squat': 'Bodyweight_Squat', 'bodyweight squats': 'Bodyweight_Squat',
+  // DEADLIFTS & HIP HINGE
+  'deadlift': 'Barbell_Deadlift', 'barbell deadlift': 'Barbell_Deadlift', 'conventional deadlift': 'Barbell_Deadlift',
+  'romanian deadlift': 'Romanian_Deadlift_With_Dumbbells', 'rdl': 'Romanian_Deadlift_With_Dumbbells',
+  'romanian deadlifts': 'Romanian_Deadlift_With_Dumbbells',
+  'sumo deadlift': 'Sumo_Deadlift',
+  'stiff leg deadlift': 'Stiff-Legged_Barbell_Deadlift', 'stiff-legged deadlift': 'Stiff-Legged_Barbell_Deadlift',
+  'hip thrust': 'Barbell_Hip_Thrust', 'barbell hip thrust': 'Barbell_Hip_Thrust', 'hip thrusts': 'Barbell_Hip_Thrust',
+  'glute bridge': 'Barbell_Glute_Bridge', 'barbell glute bridge': 'Barbell_Glute_Bridge',
+  'good morning': 'Good_Morning', 'good mornings': 'Good_Morning',
+  'kettlebell swing': 'Kettlebell_Sumo_Deadlift_High_Pull', 'kb swing': 'Kettlebell_Sumo_Deadlift_High_Pull',
+  // BENCH PRESS & CHEST
+  'bench press': 'Barbell_Bench_Press_-_Medium_Grip', 'barbell bench press': 'Barbell_Bench_Press_-_Medium_Grip', 'flat bench press': 'Barbell_Bench_Press_-_Medium_Grip',
+  'incline bench press': 'Barbell_Incline_Bench_Press_-_Medium_Grip', 'incline barbell bench press': 'Barbell_Incline_Bench_Press_-_Medium_Grip',
+  'dumbbell bench press': 'Dumbbell_Bench_Press', 'dumbbell press': 'Dumbbell_Bench_Press', 'flat dumbbell press': 'Dumbbell_Bench_Press',
+  'incline dumbbell press': 'Incline_Dumbbell_Press', 'incline dumbbell bench press': 'Incline_Dumbbell_Press',
+  'decline bench press': 'Decline_Barbell_Bench_Press', 'decline barbell bench press': 'Decline_Barbell_Bench_Press',
+  'decline dumbbell press': 'Decline_Dumbbell_Bench_Press',
+  'dumbbell fly': 'Dumbbell_Flyes', 'dumbbell flyes': 'Dumbbell_Flyes', 'chest fly': 'Dumbbell_Flyes', 'dumbbell flies': 'Dumbbell_Flyes',
+  'incline dumbbell fly': 'Incline_Dumbbell_Flyes', 'incline flyes': 'Incline_Dumbbell_Flyes',
+  'cable fly': 'Cable_Crossover', 'cable crossover': 'Cable_Crossover', 'cable flyes': 'Cable_Crossover',
+  'push up': 'Pushups', 'push-up': 'Pushups', 'pushup': 'Pushups', 'push ups': 'Pushups', 'pushups': 'Pushups',
+  'dip': 'Dips_-_Chest_Version', 'dips': 'Dips_-_Chest_Version', 'chest dip': 'Dips_-_Chest_Version', 'chest dips': 'Dips_-_Chest_Version',
+  'bench dip': 'Bench_Dips', 'bench dips': 'Bench_Dips', 'tricep dip': 'Bench_Dips',
+  'pec deck': 'Butterfly', 'butterfly': 'Butterfly',
+  // ROWS & BACK
+  'barbell row': 'Bent_Over_Barbell_Row', 'bent over barbell row': 'Bent_Over_Barbell_Row', 'bent over row': 'Bent_Over_Barbell_Row', 'bent-over barbell row': 'Bent_Over_Barbell_Row',
+  'dumbbell row': 'Bent_Over_Two-Dumbbell_Row', 'bent over dumbbell row': 'Bent_Over_Two-Dumbbell_Row',
+  'single arm dumbbell row': 'One-Arm_Dumbbell_Row', 'single-arm dumbbell row': 'One-Arm_Dumbbell_Row',
+  'one arm dumbbell row': 'One-Arm_Dumbbell_Row', 'single-arm row': 'One-Arm_Dumbbell_Row',
+  'single-arm dumbbell rows': 'One-Arm_Dumbbell_Row',
+  'seated cable row': 'Seated_Cable_Rows', 'cable row': 'Seated_Cable_Rows', 'seated row': 'Seated_Cable_Rows',
+  't-bar row': 'T-Bar_Row_with_Handle', 't bar row': 'T-Bar_Row_with_Handle',
+  'pull up': 'Pullups', 'pull-up': 'Pullups', 'pullup': 'Pullups', 'pull ups': 'Pullups', 'pullups': 'Pullups',
+  'chin up': 'Chin-Up', 'chin-up': 'Chin-Up', 'chinup': 'Chin-Up', 'chin ups': 'Chin-Up',
+  'lat pulldown': 'Wide-Grip_Lat_Pulldown', 'lat pull down': 'Wide-Grip_Lat_Pulldown', 'wide grip lat pulldown': 'Wide-Grip_Lat_Pulldown',
+  'close grip lat pulldown': 'Close-Grip_Front_Lat_Pulldown',
+  'inverted row': 'Inverted_Row', 'body row': 'Inverted_Row', 'inverted rows': 'Inverted_Row',
+  // SHOULDERS
+  'overhead press': 'Barbell_Shoulder_Press', 'barbell overhead press': 'Barbell_Shoulder_Press', 'military press': 'Barbell_Shoulder_Press', 'shoulder press': 'Barbell_Shoulder_Press', 'barbell shoulder press': 'Barbell_Shoulder_Press',
+  'dumbbell shoulder press': 'Dumbbell_Shoulder_Press', 'dumbbell overhead press': 'Dumbbell_Shoulder_Press', 'seated dumbbell press': 'Dumbbell_Shoulder_Press',
+  'arnold press': 'Arnold_Dumbbell_Press', 'arnold dumbbell press': 'Arnold_Dumbbell_Press',
+  'lateral raise': 'Side_Lateral_Raise', 'side lateral raise': 'Side_Lateral_Raise', 'lateral raises': 'Side_Lateral_Raise', 'side raise': 'Side_Lateral_Raise',
+  'front raise': 'Front_Dumbbell_Raise', 'front dumbbell raise': 'Front_Dumbbell_Raise', 'front raises': 'Front_Dumbbell_Raise',
+  'rear delt fly': 'Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench', 'reverse fly': 'Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench',
+  'rear delt raise': 'Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench',
+  'face pull': 'Face_Pull', 'cable face pull': 'Face_Pull', 'face pulls': 'Face_Pull',
+  'upright row': 'Upright_Barbell_Row', 'barbell upright row': 'Upright_Barbell_Row',
+  'shrug': 'Barbell_Shrug', 'barbell shrug': 'Barbell_Shrug', 'shrugs': 'Barbell_Shrug',
+  'dumbbell shrug': 'Dumbbell_Shrug', 'dumbbell shrugs': 'Dumbbell_Shrug',
+  // BICEPS
+  'barbell curl': 'Barbell_Curl', 'bicep curl': 'Barbell_Curl', 'barbell bicep curl': 'Barbell_Curl',
+  'dumbbell curl': 'Dumbbell_Bicep_Curl', 'dumbbell bicep curl': 'Dumbbell_Bicep_Curl', 'bicep curls': 'Dumbbell_Bicep_Curl',
+  'hammer curl': 'Hammer_Curls', 'hammer curls': 'Hammer_Curls',
+  'incline dumbbell curl': 'Alternate_Incline_Dumbbell_Curl', 'incline curl': 'Alternate_Incline_Dumbbell_Curl',
+  'preacher curl': 'Preacher_Curl', 'preacher curls': 'Preacher_Curl',
+  'concentration curl': 'Concentration_Curls', 'concentration curls': 'Concentration_Curls',
+  'cable curl': 'Standing_Biceps_Cable_Curl', 'cable bicep curl': 'Standing_Biceps_Cable_Curl',
+  'ez bar curl': 'EZ-Bar_Curl', 'ez-bar curl': 'EZ-Bar_Curl',
+  // TRICEPS
+  'tricep pushdown': 'Triceps_Pushdown', 'tricep push down': 'Triceps_Pushdown', 'cable pushdown': 'Triceps_Pushdown', 'triceps pushdown': 'Triceps_Pushdown',
+  'overhead tricep extension': 'Dumbbell_One-Arm_Triceps_Extension', 'tricep extension': 'Dumbbell_One-Arm_Triceps_Extension',
+  'skull crusher': 'EZ-Bar_Skullcrusher', 'skull crushers': 'EZ-Bar_Skullcrusher', 'skullcrusher': 'EZ-Bar_Skullcrusher',
+  'close grip bench press': 'Close-Grip_Barbell_Bench_Press', 'close-grip bench press': 'Close-Grip_Barbell_Bench_Press',
+  'tricep kickback': 'Dumbbell_Kickback', 'tricep kickbacks': 'Dumbbell_Kickback', 'kickback': 'Dumbbell_Kickback',
+  'diamond push up': 'Pushups_Close_And_Wide_Hand_Positions', 'diamond pushup': 'Pushups_Close_And_Wide_Hand_Positions',
+  // ABS & CORE
+  'crunch': 'Crunches', 'crunches': 'Crunches',
+  'sit up': '3_4_Sit-Up', 'sit-up': '3_4_Sit-Up', 'situp': '3_4_Sit-Up',
+  'decline sit up': 'Decline_Crunch', 'decline situp': 'Decline_Crunch',
+  'hanging leg raise': 'Hanging_Leg_Raise', 'hanging leg raises': 'Hanging_Leg_Raise', 'leg raise': 'Hanging_Leg_Raise',
+  'hanging knee raise': 'Hanging_Leg_Raise',
+  'plank': 'Plank', 'planks': 'Plank', 'front plank': 'Plank',
+  'side plank': 'Side_Bridge',
+  'russian twist': 'Russian_Twist', 'russian twists': 'Russian_Twist',
+  'bicycle crunch': 'Air_Bike', 'bicycle crunches': 'Air_Bike',
+  'mountain climber': 'Mountain_Climbers', 'mountain climbers': 'Mountain_Climbers',
+  'ab wheel': 'Ab_Roller', 'ab roller': 'Ab_Roller', 'ab rollout': 'Barbell_Ab_Rollout_-_On_Knees',
+  'cable woodchop': 'Cross-Body_Crunch', 'wood chop': 'Cross-Body_Crunch',
+  'dead bug': 'Dead_Bug', 'dead bugs': 'Dead_Bug',
+  'v up': 'V-Bar_Pullup', 'v-up': 'V-Bar_Pullup',
+  'reverse crunch': 'Reverse_Crunch', 'reverse crunches': 'Reverse_Crunch',
+  'flutter kick': 'Flutter_Kicks', 'flutter kicks': 'Flutter_Kicks',
+  // GLUTES
+  'glute kickback': 'Glute_Kickback', 'donkey kick': 'Glute_Kickback',
+  'cable glute kickback': 'Glute_Kickback',
+  'fire hydrant': 'Fire_Hydrant',
+  // FULL BODY / OLYMPIC / POWER
+  'clean': 'Clean_and_Jerk', 'clean and jerk': 'Clean_and_Jerk', 'power clean': 'Clean_and_Press',
+  'snatch': 'Snatch',
+  'thruster': 'Thrusters', 'thrusters': 'Thrusters',
+  'burpee': 'Burpees', 'burpees': 'Burpees',
+  'box jump': 'Bench_Jump', 'box jumps': 'Bench_Jump',
+  'jump squat': 'Freehand_Jump_Squat', 'jump squats': 'Freehand_Jump_Squat',
+  'kettlebell clean': 'Kettlebell_One-Arm_Clean',
+  'kettlebell snatch': 'Kettlebell_One-Arm_Snatch',
+  'battle ropes': 'Battling_Ropes', 'battling ropes': 'Battling_Ropes',
+  'farmers walk': 'Farmers_Walk', 'farmer walk': 'Farmers_Walk', 'farmers carry': 'Farmers_Walk',
+  // STRETCHES / MOBILITY
+  'quad stretch': 'All_Fours_Quad_Stretch',
+  'hamstring stretch': '90_90_Hamstring',
+  'chest stretch': 'Behind_Head_Chest_Stretch',
+  'shoulder stretch': 'Arm_Circles',
+  'hip circle': 'Hip_Circles_Prone', 'hip circles': 'Hip_Circles_Prone',
+  'foam roll': 'Anterior_Tibialis-SMR', 'foam rolling': 'Anterior_Tibialis-SMR',
+  // CARDIO
+  'rowing': 'Rowing_Stationary', 'row machine': 'Rowing_Stationary',
+  'cycling': 'Bicycling_Stationary', 'bike': 'Bicycling_Stationary', 'stationary bike': 'Bicycling_Stationary',
+  'treadmill': 'Jogging-Treadmill', 'jogging': 'Jogging-Treadmill', 'running': 'Jogging-Treadmill',
+  'sprint': 'Jogging-Treadmill', 'sprints': 'Jogging-Treadmill',
+  'jumping jack': 'Jumping_Jacks', 'jumping jacks': 'Jumping_Jacks',
+  // MISC
+  'hyperextension': 'Hyperextensions_With_No_Hyperextension_Bench', 'back extension': 'Hyperextensions_With_No_Hyperextension_Bench',
+  'superman': 'Superman', 'supermans': 'Superman',
+  'pallof press': 'Band_Pull_Apart',
+  'plank push up': 'Pushups',
+  'push-up to t-rotation': 'Pushups',
+};
+
+// Map for existing A/B/C/D workout exercises
 const gifMap = {
-  'a-0': 'barbell squat', 'a-1': 'barbell bench press', 'a-2': 'bent over barbell row',
-  'a-3': 'dumbbell lunge', 'a-4': 'incline dumbbell press', 'a-5': 'cable face pull',
+  'a-0': 'barbell back squat', 'a-1': 'barbell bench press', 'a-2': 'bent over barbell row',
+  'a-3': 'dumbbell lunge', 'a-4': 'incline dumbbell press', 'a-5': 'face pull',
   'a-6': 'hanging leg raise', 'a-7': 'plank', 'a-8': 'cable woodchop',
-  'b-0': 'deadlift', 'b-1': 'barbell overhead press', 'b-2': 'pull up',
+  'b-0': 'deadlift', 'b-1': 'overhead press', 'b-2': 'pull up',
   'b-3': 'romanian deadlift', 'b-4': 'lateral raise', 'b-5': 'barbell curl',
   'b-6': 'ab wheel', 'b-7': 'russian twist', 'b-8': 'dead bug',
   'c-0': 'front squat', 'c-1': 'dumbbell bench press', 'c-2': 'seated cable row',
@@ -2682,69 +2824,89 @@ const gifMap = {
   'd-0': 'sprint', 'd-1': 'hanging knee raise', 'd-2': 'side plank',
   'd-3': 'bicycle crunch', 'd-4': 'plank push up',
 };
-const gifCache = {};
 
-async function loadGif(key) {
-  const el = document.getElementById('gif-' + key);
-  if (!el || el.tagName === 'IMG') return;
-  if (gifCache[key]) { showGif(el, gifCache[key]); return; }
-  try {
-    const q = encodeURIComponent(gifMap[key] || '');
-    const r = await fetch(`https://wger.de/api/v2/exercise/search/?term=${q}&language=english&format=json`);
-    const d = await r.json();
-    if (d.suggestions && d.suggestions.length > 0) {
-      const exId = d.suggestions[0].data?.id;
-      if (exId) {
-        const imgRes = await fetch(`https://wger.de/api/v2/exerciseimage/?exercise=${exId}&format=json`);
-        const imgData = await imgRes.json();
-        if (imgData.results && imgData.results.length > 0) {
-          const url = imgData.results[0].image;
-          gifCache[key] = url;
-          showGif(el, url);
-          return;
-        }
-      }
-    }
-  } catch {}
-  el.innerHTML = '<span class="ico">💪</span><span style="font-size:11px">Tap to search on YouTube</span>';
-  el.style.cursor = 'pointer';
-  el.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent((gifMap[key]||'') + ' exercise how to')}`, '_blank');
+// Resolve an exercise name to its image slug
+function resolveExerciseSlug(name) {
+  const lower = name.toLowerCase().replace(/[^\w\s-]/g, '').trim();
+  // Direct match
+  if (exerciseSlugMap[lower]) return exerciseSlugMap[lower];
+  // Try without common prefixes
+  for (const prefix of ['barbell ', 'dumbbell ', 'cable ', 'machine ', 'seated ', 'standing ']) {
+    if (exerciseSlugMap[lower.replace(prefix, '')]) return exerciseSlugMap[lower.replace(prefix, '')];
+    if (!lower.startsWith(prefix) && exerciseSlugMap[prefix + lower]) return exerciseSlugMap[prefix + lower];
+  }
+  // Fuzzy: find best partial match
+  let best = null, bestLen = 0;
+  for (const [key, slug] of Object.entries(exerciseSlugMap)) {
+    if (lower.includes(key) && key.length > bestLen) { best = slug; bestLen = key.length; }
+    if (key.includes(lower) && lower.length > bestLen) { best = slug; bestLen = lower.length; }
+  }
+  return best;
 }
 
-function showGif(el, url) {
+// ---- EXERCISE IMAGE LOADING ----
+const imgCache = {};
+
+function loadExerciseImg(elId, exerciseName) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const slug = resolveExerciseSlug(exerciseName);
+  if (!slug) {
+    el.innerHTML = '<span class="ico">💪</span>';
+    el.style.cursor = 'pointer';
+    el.onclick = () => window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(exerciseName + ' exercise how to'), '_blank');
+    return;
+  }
+  const url0 = EXERCISE_IMG_BASE + '/' + slug + '/0.jpg';
+  const url1 = EXERCISE_IMG_BASE + '/' + slug + '/1.jpg';
+  if (imgCache[slug]) {
+    showAnimatedImg(el, imgCache[slug][0], imgCache[slug][1]);
+    return;
+  }
+  // Preload both frames
+  const img0 = new Image(); img0.crossOrigin = 'anonymous';
+  const img1 = new Image(); img1.crossOrigin = 'anonymous';
+  let loaded = 0;
+  const onReady = () => {
+    loaded++;
+    if (loaded < 2) return;
+    imgCache[slug] = [url0, url1];
+    showAnimatedImg(el, url0, url1);
+  };
+  img0.onload = onReady;
+  img1.onload = onReady;
+  img0.onerror = () => {
+    el.innerHTML = '<span class="ico">💪</span>';
+  };
+  img1.onerror = onReady; // still show frame 0 if frame 1 fails
+  img0.src = url0;
+  img1.src = url1;
+}
+
+function showAnimatedImg(el, url0, url1) {
   const img = document.createElement('img');
-  img.src = url;
+  img.src = url0;
   img.className = 'ex-gif';
-  img.onerror = () => { el.style.display = 'flex'; };
+  img.alt = 'Exercise illustration';
+  // Alternate between two frames for animation
+  let frame = 0;
+  const interval = setInterval(() => {
+    frame = 1 - frame;
+    img.src = frame ? url1 : url0;
+  }, 1200);
+  // Clean up when removed from DOM
+  const obs = new MutationObserver(() => {
+    if (!document.contains(img)) { clearInterval(interval); obs.disconnect(); }
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
   el.replaceWith(img);
 }
 
-// ---- LOAD GIF FOR AI EXERCISES ----
-async function loadAiGif(id, name) {
-  const el = document.getElementById('gif-' + id);
-  if (!el || el.tagName === 'IMG') return;
-  if (gifCache[name]) { showGif(el, gifCache[name]); return; }
-  try {
-    const q = encodeURIComponent(name);
-    const r = await fetch(`https://wger.de/api/v2/exercise/search/?term=${q}&language=english&format=json`);
-    const d = await r.json();
-    if (d.suggestions && d.suggestions.length > 0) {
-      const exId = d.suggestions[0].data?.id;
-      if (exId) {
-        const imgRes = await fetch(`https://wger.de/api/v2/exerciseimage/?exercise=${exId}&format=json`);
-        const imgData = await imgRes.json();
-        if (imgData.results && imgData.results.length > 0) {
-          const url = imgData.results[0].image;
-          gifCache[name] = url;
-          showGif(el, url);
-          return;
-        }
-      }
-    }
-  } catch {}
-  el.innerHTML = '<span class="ico">💪</span>';
-  el.style.cursor = 'pointer';
-  el.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' exercise how to')}`, '_blank');
+// Load images for built-in A/B/C/D exercises
+function loadGif(key) {
+  const name = gifMap[key];
+  if (!name) return;
+  loadExerciseImg('gif-' + key, name);
 }
 
 // ---- STATE ----
@@ -3596,7 +3758,7 @@ function showAiWorkout(workout) {
   document.getElementById('ai-gen-result').classList.add('show');
   // Load exercise images
   (workout.exercises || []).forEach((ex, i) => {
-    loadAiGif('preview-' + i, ex.name);
+    loadExerciseImg('gif-preview-' + i, ex.name);
   });
 }
 
@@ -3683,7 +3845,7 @@ function startAiWorkout() {
   // Build set dots and load exercise images
   exercises.forEach((ex, i) => {
     buildAiSetDots(i);
-    loadAiGif('ai-' + i, ex.name);
+    loadExerciseImg('gif-ai-' + i, ex.name);
   });
 }
 
