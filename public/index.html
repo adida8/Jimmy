@@ -2719,6 +2719,34 @@ function showGif(el, url) {
   el.replaceWith(img);
 }
 
+// ---- LOAD GIF FOR AI EXERCISES ----
+async function loadAiGif(id, name) {
+  const el = document.getElementById('gif-' + id);
+  if (!el || el.tagName === 'IMG') return;
+  if (gifCache[name]) { showGif(el, gifCache[name]); return; }
+  try {
+    const q = encodeURIComponent(name);
+    const r = await fetch(`https://wger.de/api/v2/exercise/search/?term=${q}&language=english&format=json`);
+    const d = await r.json();
+    if (d.suggestions && d.suggestions.length > 0) {
+      const exId = d.suggestions[0].data?.id;
+      if (exId) {
+        const imgRes = await fetch(`https://wger.de/api/v2/exerciseimage/?exercise=${exId}&format=json`);
+        const imgData = await imgRes.json();
+        if (imgData.results && imgData.results.length > 0) {
+          const url = imgData.results[0].image;
+          gifCache[name] = url;
+          showGif(el, url);
+          return;
+        }
+      }
+    }
+  } catch {}
+  el.innerHTML = '<span class="ico">💪</span>';
+  el.style.cursor = 'pointer';
+  el.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' exercise how to')}`, '_blank');
+}
+
 // ---- STATE ----
 const counts = { a: 9, b: 9, c: 9, d: 6 };
 const done = { a: new Set(), b: new Set(), c: new Set(), d: new Set() };
@@ -3558,6 +3586,7 @@ function showAiWorkout(workout) {
           </div>
         </div>
         <div class="ex-body" style="display:block;padding:8px 16px 12px">
+          <div class="ex-gif-placeholder" id="gif-preview-${i}"><span class="ico">🏋️</span>Loading image...</div>
           <div class="cue-box"><strong>Tips</strong> ${ex.cues || ''}</div>
         </div>
       </div>`;
@@ -3565,6 +3594,10 @@ function showAiWorkout(workout) {
 
   container.innerHTML = html;
   document.getElementById('ai-gen-result').classList.add('show');
+  // Load exercise images
+  (workout.exercises || []).forEach((ex, i) => {
+    loadAiGif('preview-' + i, ex.name);
+  });
 }
 
 function dismissAiWorkout() {
@@ -3634,6 +3667,7 @@ function startAiWorkout() {
           </div>
         </div>
         <div class="ex-body">
+          <div class="ex-gif-placeholder" id="gif-ai-${i}"><span class="ico">🏋️</span>Loading image...</div>
           <div class="cue-box"><strong>Key Cues</strong> ${ex.cues || ''}</div>
           <div class="set-tracker"><div id="sets-${key}"></div></div>
         </div>
@@ -3646,9 +3680,10 @@ function startAiWorkout() {
   const dayTabs = document.querySelector('.workout-day-tabs');
   dayTabs.parentNode.insertBefore(panel, dayTabs.nextSibling);
 
-  // Build set dots
+  // Build set dots and load exercise images
   exercises.forEach((ex, i) => {
     buildAiSetDots(i);
+    loadAiGif('ai-' + i, ex.name);
   });
 }
 
