@@ -1555,7 +1555,16 @@ body {
       </div>
     </div>
   </div>
-  <!-- AI Workout Generator -->
+  <div class="workout-day-tabs">
+    <button class="workout-day-tab active" onclick="switchWorkoutDay('a')"><span class="big">A</span>Push</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('b')"><span class="big">B</span>Pull</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('c')"><span class="big">C</span>Legs</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('d')"><span class="big">D</span>Core</button>
+    <button class="workout-day-tab" onclick="switchWorkoutDay('custom')"><span class="big">🤖</span>Custom</button>
+  </div>
+
+<!-- CUSTOM AI WORKOUT -->
+<div class="workout-panel" id="panel-custom">
   <div class="ai-workout-gen">
     <div class="ai-label"><span>🤖</span> What kind of workout today?</div>
     <div class="ai-input-row">
@@ -1572,7 +1581,6 @@ body {
     </div>
   </div>
 
-  <!-- AI generated workout result -->
   <div class="ai-gen-spinner" id="ai-gen-spinner">
     <span style="font-size:32px">🤖</span><br>Generating your workout<span class="spinner-dots"></span>
   </div>
@@ -1586,13 +1594,7 @@ body {
     </div>
     <div id="ai-gen-exercises"></div>
   </div>
-
-  <div class="workout-day-tabs">
-    <button class="workout-day-tab active" onclick="switchWorkoutDay('a')"><span class="big">A</span>Squat</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('b')"><span class="big">B</span>Deadlift</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('c')"><span class="big">C</span>Front Sq</button>
-    <button class="workout-day-tab" onclick="switchWorkoutDay('d')"><span class="big">D</span>HIIT</button>
-  </div>
+</div>
 
 <!-- DAY A -->
 <div class="workout-panel active" id="panel-a">
@@ -3488,7 +3490,7 @@ let currentWorkoutDay = 'a';
 function switchWorkoutDay(day) {
   currentWorkoutDay = day;
   document.querySelectorAll('.workout-day-tab').forEach(t => t.classList.remove('active'));
-  const tabIdx = ['a','b','c','d'].indexOf(day);
+  const tabIdx = ['a','b','c','d','custom'].indexOf(day);
   const tabs = document.querySelectorAll('.workout-day-tab');
   if (tabs[tabIdx]) tabs[tabIdx].classList.add('active');
 
